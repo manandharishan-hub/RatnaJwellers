@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BadgeCheck, CreditCard, Gem, ShoppingBag, Truck } from "lucide-react";
 import { CartItem } from "@/components/cart/CartItem";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,25 @@ import { centsToCurrency } from "@/lib/utils";
 const shipping = 500;
 
 export default function CartPage() {
+  const [couponCode, setCouponCode] = useState("");
+  const [couponMessage, setCouponMessage] = useState("");
   const items = useCartStore((state) => state.items);
+  const appliedCoupon = useCartStore((state) => state.coupon);
+  const setCoupon = useCartStore((state) => state.setCoupon);
   const updateItem = useCartStore((state) => state.updateItem);
   const removeItem = useCartStore((state) => state.removeItem);
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
-  const total = subtotal > 0 ? subtotal + shipping : 0;
+  const enteredCouponCode = couponCode.trim().toUpperCase();
+  const activeCoupon = enteredCouponCode && appliedCoupon?.code === enteredCouponCode ? appliedCoupon : null;
+  const discount = Math.min(activeCoupon?.discount ?? 0, subtotal);
+  const total = subtotal > 0 ? subtotal + shipping - discount : 0;
+
+  useEffect(() => {
+    if (!couponCode.trim() && appliedCoupon) {
+      setCoupon(null);
+    }
+  }, [appliedCoupon, couponCode, setCoupon]);
 
   return (
     <div className="bg-[#F8F6F2] px-6 py-10 md:px-10 lg:px-16">
@@ -73,6 +86,64 @@ export default function CartPage() {
                   <span>Estimated shipping</span>
                   <span className="font-semibold text-[#0A1628]">{centsToCurrency(shipping)}</span>
                 </div>
+                <form
+                  className="grid gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    setCouponMessage("");
+                    const trimmedCode = couponCode.trim();
+                    if (!trimmedCode) {
+                      setCoupon(null);
+                      setCouponMessage("Enter a coupon code first.");
+                      return;
+                    }
+                    fetch("/api/coupons/validate", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ code: trimmedCode, subtotal }),
+                    })
+                      .then(async (response) => {
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) throw new Error(data.message || "Coupon code is not valid.");
+                        setCoupon(data);
+                        setCouponMessage("Coupon applied.");
+                      })
+                      .catch((error) => {
+                        setCoupon(null);
+                        setCouponMessage(error instanceof Error ? error.message : "Coupon code is not valid.");
+                      });
+                  }}
+                >
+                  <label htmlFor="coupon" className="font-medium text-[#0A1628]">Apply coupon</label>
+                  <div className="flex gap-2">
+                    <input
+                      id="coupon"
+                      value={couponCode}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setCouponCode(value);
+                        if (!value.trim()) {
+                          setCoupon(null);
+                          setCouponMessage("");
+                        } else if (appliedCoupon && value.trim().toUpperCase() !== appliedCoupon.code) {
+                          setCoupon(null);
+                          setCouponMessage("");
+                        }
+                      }}
+                      placeholder="Enter coupon code"
+                      className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 outline-none focus:border-[#C9A84C]"
+                    />
+                    <button type="submit" className="rounded-full bg-[#0A1628] px-4 py-2 font-semibold text-white">Apply</button>
+                  </div>
+                  {couponMessage && <p className={`text-xs font-semibold ${activeCoupon ? "text-emerald-700" : "text-red-600"}`}>{couponMessage}</p>}
+                  {activeCoupon && <p className="text-xs font-semibold text-emerald-700">Coupon applied: {activeCoupon.code}</p>}
+                </form>
+                {discount > 0 && (
+                  <div className="flex justify-between">
+                    <span>Discount</span>
+                    <span className="font-semibold text-emerald-700">-{centsToCurrency(discount)}</span>
+                  </div>
+                )}
                 <div className="border-t border-slate-200 pt-4">
                   <div className="flex justify-between text-base text-[#0A1628]">
                     <span className="font-semibold">Total</span>

@@ -45,6 +45,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     url: image.url,
     isPrimary: Boolean(image.isPrimary),
   }));
+  const productVariants = (product.variants ?? []).map((variant) => ({
+    size: variant.size,
+    stock: variant.stock,
+  }));
   const primaryImage = productImages.find((image) => image.isPrimary)?.url ?? productImages[0]?.url ?? "/favicon.ico";
 
   return (
@@ -108,7 +112,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             )}
           </div>
         </div>
-        <ProductDetailClient id={product._id.toString()} name={product.name} price={product.price} images={productImages} sku={product.sku} material={product.material} gemstone={product.gemstone} weight={product.weight} occasion={product.occasion} />
+        <ProductDetailClient id={product._id.toString()} name={product.name} price={product.price} images={productImages} sku={product.sku} material={product.material} gemstone={product.gemstone} weight={product.weight} occasion={product.occasion} totalStock={product.totalStock ?? 0} variants={productVariants} />
       </div>
     </div>
   );

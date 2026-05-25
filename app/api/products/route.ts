@@ -15,8 +15,8 @@ export async function GET(request: Request) {
   const material = url.searchParams.getAll("material");
   const gemstone = url.searchParams.getAll("gemstone");
   const occasion = url.searchParams.getAll("occasion");
-  const minPrice = Number(url.searchParams.get("minPrice") || 0);
-  const maxPrice = Number(url.searchParams.get("maxPrice") || 0);
+  const minPrice = Number(url.searchParams.get("minPrice") || 0) * 100;
+  const maxPrice = Number(url.searchParams.get("maxPrice") || 0) * 100;
   const inStockOnly = url.searchParams.get("inStockOnly") === "true";
   const sort = url.searchParams.get("sort") || "newest";
   const page = Math.max(1, Number(url.searchParams.get("page") || 1));

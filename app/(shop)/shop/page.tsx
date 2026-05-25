@@ -38,8 +38,8 @@ async function getShopData(searchParams: Awaited<ShopPageProps["searchParams"]>)
     if (searchParams.gemstone) query.gemstone = searchParams.gemstone;
     if (searchParams.occasion) query.occasion = searchParams.occasion;
     if (searchParams.inStockOnly === "true") query.totalStock = { $gt: 0 };
-    const minPrice = Number(searchParams.minPrice || 0);
-    const maxPrice = Number(searchParams.maxPrice || 0);
+    const minPrice = Number(searchParams.minPrice || 0) * 100;
+    const maxPrice = Number(searchParams.maxPrice || 0) * 100;
     if (minPrice || maxPrice) {
       query.price = {};
       if (minPrice) (query.price as Record<string, number>).$gte = minPrice;
@@ -105,12 +105,32 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           <form className="space-y-4 border-t border-slate-200 pt-5 text-sm">
             <input type="hidden" name="search" value={resolvedSearchParams.search ?? ""} />
             <div>
+              <label htmlFor="category" className="font-medium text-slate-900">Category</label>
+              <select id="category" name="category" defaultValue={resolvedSearchParams.category ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2">
+                <option value="">Any category</option>
+                {categories.map((category) => (
+                  <option key={category._id.toString()} value={category.slug}>{category.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label htmlFor="material" className="font-medium text-slate-900">Material</label>
               <select id="material" name="material" defaultValue={resolvedSearchParams.material ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2">
                 <option value="">Any material</option>
                 <option value="Gold">Gold</option>
                 <option value="Silver">Silver</option>
                 <option value="Platinum">Platinum</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="gemstone" className="font-medium text-slate-900">Gemstone</label>
+              <select id="gemstone" name="gemstone" defaultValue={resolvedSearchParams.gemstone ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2">
+                <option value="">Any gemstone</option>
+                <option value="Diamond">Diamond</option>
+                <option value="Ruby">Ruby</option>
+                <option value="Pearl">Pearl</option>
+                <option value="Emerald">Emerald</option>
+                <option value="None">None</option>
               </select>
             </div>
             <div>
@@ -124,12 +144,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label htmlFor="minPrice" className="font-medium text-slate-900">Min cents</label>
-                <input id="minPrice" name="minPrice" type="number" min="0" defaultValue={resolvedSearchParams.minPrice ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                <label htmlFor="minPrice" className="font-medium text-slate-900">Min price (NPR)</label>
+                <input id="minPrice" name="minPrice" type="number" min="0" placeholder="1000" defaultValue={resolvedSearchParams.minPrice ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2" />
               </div>
               <div>
-                <label htmlFor="maxPrice" className="font-medium text-slate-900">Max cents</label>
-                <input id="maxPrice" name="maxPrice" type="number" min="0" defaultValue={resolvedSearchParams.maxPrice ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                <label htmlFor="maxPrice" className="font-medium text-slate-900">Max price (NPR)</label>
+                <input id="maxPrice" name="maxPrice" type="number" min="0" placeholder="50000" defaultValue={resolvedSearchParams.maxPrice ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2" />
               </div>
             </div>
             <label className="flex items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 font-medium text-slate-900">

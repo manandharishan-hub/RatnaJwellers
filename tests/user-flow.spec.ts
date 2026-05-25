@@ -5,7 +5,7 @@ test("account orders redirects unauthenticated users to login", async ({ page })
   await expect(page).toHaveURL(/\/login/);
 });
 
-test("shop and cart pages are reachable", async ({ page }) => {
+test("shop page is reachable and cart is open to guests", async ({ page }) => {
   await page.goto("/shop");
   await expect(page.getByRole("heading", { name: /shop elegant designer pieces/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /apply filters/i })).toBeVisible();
@@ -14,23 +14,20 @@ test("shop and cart pages are reachable", async ({ page }) => {
   await expect(page).toHaveURL(/material=Gold/);
 
   await page.goto("/cart");
-  await expect(page.getByRole("heading", { name: /your cart/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /review your jewelry selection/i })).toBeVisible();
 });
 
-test("checkout page renders shipping and payment sections", async ({ page }) => {
+test("checkout supports guest login and register choices", async ({ page }) => {
   await page.goto("/checkout");
-  await expect(page.getByRole("heading", { name: /checkout/i })).toBeVisible();
-  await expect(page.getByLabel(/first name/i)).toBeVisible();
-  await expect(page.getByRole("heading", { name: /demo payment/i })).toBeVisible();
-  await expect(page.getByLabel(/cardholder name/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /pay now/i })).toBeVisible();
+  await expect(page.getByText(/guest checkout/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Login/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Register/i })).toBeVisible();
 });
 
 test("navbar hides dashboard before login and shows auth links", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: /^Dashboard$/i })).toHaveCount(0);
-  await expect(page.getByLabel(/sign in/i)).toBeVisible();
-  await expect(page.getByLabel(/register/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: /login \/ register/i })).toBeVisible();
 });
 
 test("auth pages expose validation-oriented forms", async ({ page }) => {

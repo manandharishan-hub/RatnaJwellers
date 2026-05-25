@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ratna Jewels Core Feature Wireframes</title>
+    <style>
+      :root {
+        --bg: #f4f4f4;
+        --panel: #ffffff;
+        --ink: #1f2933;
+        --muted: #68727f;
+        --line: #cfd4da;
+        --line-dark: #8f99a3;
+        --fill: #e7e9ec;
+        --fill-dark: #d6d9dd;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Arial, Helvetica, sans-serif;
+        line-height: 1.45;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+        border-right: 1px solid var(--line);
+        background: #fff;
+        padding: 24px 18px;
+      }
+
+      .brand {
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 18px;
+        padding-bottom: 18px;
+      }
+
+      .brand h1 {
+        margin: 0 0 6px;
+        font-size: 20px;
+      }
+
+      .brand p,
+      .screen-note,
+      .small {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 0;
+      }
+
+      .nav-group {
+        margin: 18px 0;
+      }
+
+      .nav-group h2 {
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        margin: 0 0 8px;
+        text-transform: uppercase;
+      }
+
+      .nav-group a {
+        display: block;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        color: #374151;
+        font-size: 14px;
+        padding: 8px 10px;
+      }
+
+      .nav-group a:hover,
+      .nav-group a:focus {
+        border-color: var(--line);
+        background: var(--fill);
+        outline: none;
+      }
+
+      main {
+        padding: 28px;
+      }
+
+      .intro {
+        max-width: 980px;
+        margin-bottom: 26px;
+      }
+
+      .intro h2 {
+        margin: 0 0 8px;
+        font-size: 30px;
+      }
+
+      .wireframe {
+        max-width: 1180px;
+        margin: 0 0 30px;
+        border: 1px solid var(--line-dark);
+        border-radius: 10px;
+        background: var(--panel);
+        box-shadow: 0 10px 30px rgba(31, 41, 51, 0.08);
+        overflow: hidden;
+      }
+
+      .screen-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid var(--line);
+        background: #fafafa;
+        padding: 18px 20px;
+      }
+
+      .screen-header h2 {
+        margin: 0 0 4px;
+        font-size: 22px;
+      }
+
+      .tag {
+        display: inline-flex;
+        border: 1px solid var(--line-dark);
+        border-radius: 999px;
+        color: #374151;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 10px;
+        white-space: nowrap;
+      }
+
+      .canvas {
+        padding: 20px;
+      }
+
+      .topbar,
+      .admin-topbar {
+        display: grid;
+        grid-template-columns: 160px 1fr auto;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px;
+      }
+
+      .admin-topbar {
+        grid-template-columns: 180px 1fr auto auto;
+      }
+
+      .logo,
+      .box,
+      .input,
+      .button,
+      .ghost-button,
+      .image-box,
+      .pill,
+      .metric,
+      .table,
+      .card,
+      .status,
+      .step,
+      .field,
+      .textarea,
+      .thumbnail,
+      .sidebar-menu {
+        border: 1px solid var(--line-dark);
+        background: var(--fill);
+      }
+
+      .logo {
+        border-radius: 6px;
+        font-weight: 700;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .nav-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .pill {
+        border-radius: 999px;
+        min-width: 72px;
+        padding: 8px 12px;
+        text-align: center;
+      }
+
+      .input,
+      .field,
+      .textarea {
+        border-radius: 6px;
+        color: var(--muted);
+        padding: 10px 12px;
+      }
+
+      .button,
+      .ghost-button {
+        border-radius: 6px;
+        font-weight: 700;
+        padding: 10px 14px;
+        text-align: center;
+      }
+
+      .button {
+        background: var(--line-dark);
+        color: #fff;
+      }
+
+      .ghost-button {
+        background: #fff;
+      }
+
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .section {
+        margin-top: 18px;
+      }
+
+      .section-title {
+        margin: 0 0 10px;
+        color: #374151;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .hero-copy,
+      .summary-panel,
+      .filter-panel,
+      .form-panel,
+      .admin-panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .line {
+        height: 12px;
+        border-radius: 999px;
+        background: var(--fill-dark);
+        margin: 10px 0;
+      }
+
+      .line.short {
+        width: 58%;
+      }
+
+      .line.medium {
+        width: 78%;
+      }
+
+      .image-box {
+        align-items: center;
+        border-radius: 8px;
+        display: flex;
+        min-height: 220px;
+        justify-content: center;
+      }
+
+      .card {
+        border-radius: 8px;
+        padding: 12px;
+      }
+
+      .product-card .image-box {
+        min-height: 140px;
+      }
+
+      .card-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 18px;
+      }
+
+      .filter-panel {
+        align-self: start;
+      }
+
+      .filter-panel .field,
+      .form-panel .field,
+      .form-panel .textarea {
+        margin-bottom: 10px;
+      }
+
+      .product-detail {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: 74px 1fr;
+        gap: 12px;
+      }
+
+      .thumbnail {
+        border-radius: 6px;
+        height: 68px;
+        margin-bottom: 10px;
+      }
+
+      .price {
+        font-size: 24px;
+        font-weight: 800;
+      }
+
+      .quantity {
+        display: grid;
+        grid-template-columns: 44px 64px 44px;
+        gap: 8px;
+        max-width: 170px;
+      }
+
+      .summary-panel {
+        background: #fbfbfb;
+      }
+
+      .cart-item {
+        display: grid;
+        grid-template-columns: 90px 1fr auto;
+        gap: 14px;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        padding: 14px 0;
+      }
+
+      .cart-item:last-child {
+        border-bottom: 0;
+      }
+
+      .table {
+        border-collapse: collapse;
+        border-radius: 8px;
+        display: table;
+        overflow: hidden;
+        width: 100%;
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr 1fr auto;
+        border-bottom: 1px solid var(--line-dark);
+      }
+
+      .table-row.header {
+        background: var(--fill-dark);
+        font-weight: 700;
+      }
+
+      .table-row > div {
+        padding: 12px;
+      }
+
+      .status {
+        border-radius: 999px;
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 5px 10px;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .step {
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+      }
+
+      .metric {
+        border-radius: 8px;
+        min-height: 90px;
+        padding: 16px;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 24px;
+        margin-top: 8px;
+      }
+
+      .admin-layout {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 16px;
+      }
+
+      .sidebar-menu {
+        border-radius: 8px;
+        padding: 14px;
+      }
+
+      .sidebar-menu .pill {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .admin-body {
+        min-width: 0;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .compact-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      @media (max-width: 920px) {
+        .shell {
+          display: block;
+        }
+
+        .sidebar {
+          position: static;
+          height: auto;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        main {
+          padding: 18px;
+        }
+
+        .topbar,
+        .admin-topbar,
+        .hero,
+        .split,
+        .product-detail,
+        .grid-2,
+        .grid-3,
+        .grid-4,
+        .admin-layout,
+        .compact-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .thumbs {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 8px;
+        }
+
+        .cart-item {
+          grid-template-columns: 70px 1fr;
+        }
+
+        .cart-item .actions {
+          grid-column: 1 / -1;
+        }
+
+        .table {
+          display: block;
+          overflow-x: auto;
+        }
+
+        .table-row {
+          min-width: 720px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>Ratna Wireframes</h1>
+          <p>Core ecommerce and admin flows only.</p>
+        </div>
+        <div class="nav-group">
+          <h2>Customer</h2>
+          <a href="#home">Home / Storefront</a>
+          <a href="#shop">Shop Listing</a>
+          <a href="#product">Product Detail</a>
+          <a href="#cart">Cart</a>
+          <a href="#checkout">Checkout</a>
+          <a href="#confirmation">Order Confirmation</a>
+        </div>
+        <div class="nav-group">
+          <h2>Account</h2>
+          <a href="#account">Customer Dashboard</a>
+          <a href="#orders">Orders & Tracking</a>
+        </div>
+        <div class="nav-group">
+          <h2>Admin</h2>
+          <a href="#admin-dashboard">Admin Dashboard</a>
+          <a href="#admin-products">Product Management</a>
+          <a href="#admin-product-form">Product Form</a>
+          <a href="#admin-orders">Order Management</a>
+          <a href="#admin-secondary">Reviews / CMS Panel</a>
+        </div>
+      </aside>
+
+      <main>
+        <section class="intro">
+          <h2>Low-Fidelity Wireframes</h2>
+          <p class="screen-note">This standalone artifact maps the important Ratna Jewels flows for FYP review. It uses grayscale blocks only and does not depend on the Next.js app, database, or live assets.</p>
+        </section>
+
+        <section id="home" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Home / Storefront Entry</h2>
+              <p class="screen-note">Entry point for browsing collections and moving into shopping.</p>
+            </div>
+            <span class="tag">Customer</span>
+          </div>
+          <div class="canvas">
+            <div class="topbar">
+              <div class="logo">Ratna Jewels</div>
+              <div class="nav-strip">
+                <div class="pill">Home</div>
+                <div class="pill">Shop</div>
+                <div class="pill">Collections</div>
+                <div class="pill">Contact</div>
+              </div>
+              <div class="nav-strip">
+                <div class="pill">Search</div>
+                <div class="pill">Cart</div>
+                <div class="pill">Account</div>
+              </div>
+            </div>
+            <div class="hero">
+              <div class="hero-copy">
+                <p class="section-title">Hero message</p>
+                <div class="line"></div>
+                <div class="line medium"></div>
+                <div class="line short"></div>
+                <div class="card-row">
+                  <div class="button">Shop now</div>
+                  <div class="ghost-button">View new arrivals</div>
+                </div>
+              </div>
+              <div class="image-box">Featured jewellery visual</div>
+            </div>
+            <div class="section">
+              <p class="section-title">Featured categories</p>
+              <div class="grid-4">
+                <div class="card">Rings</div>
+                <div class="card">Necklaces</div>
+                <div class="card">Bracelets</div>
+                <div class="card">Bridal</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="shop" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Shop Listing</h2>
+              <p class="screen-note">Search, filter, sort, wishlist, and enter product detail.</p>
+            </div>
+            <span class="tag">Customer</span>
+          </div>
+          <div class="canvas">
+            <div class="topbar">
+              <div class="logo">Ratna Jewels</div>
+              <div class="input">Search jewellery, rings, necklaces...</div>
+              <div class="button">Search</div>
+            </div>
+            <div class="split section">
+              <aside class="filter-panel">
+                <p class="section-title">Filters</p>
+                <div class="field">Category dropdown</div>
+                <div class="field">Material dropdown</div>
+                <div class="field">Gemstone dropdown</div>
+                <div class="grid-2">
+                  <div class="field">Min price (NPR)</div>
+                  <div class="field">Max price (NPR)</div>
+                </div>
+                <div class="field">In stock only checkbox</div>
+                <div class="button">Apply filters</div>
+              </aside>
+              <div>
+                <div class="card-row">
+                  <p class="section-title">Showing products</p>
+                  <div class="ghost-button">Sort: newest</div>
+                </div>
+                <div class="grid-3 section">
+                  <div class="card product-card">
+                    <div class="image-box">Product image</div>
+                    <div class="line"></div>
+                    <div class="small">NPR price</div>
+                    <div class="card-row"><span>Wishlist</span><span>View</span></div>
+                  </div>
+                  <div class="card product-card">
+                    <div class="image-box">Product image</div>
+                    <div class="line"></div>
+                    <div class="small">NPR price</div>
+                    <div class="card-row"><span>Wishlist</span><span>View</span></div>
+                  </div>
+                  <div class="card product-card">
+                    <div class="image-box">Product image</div>
+                    <div class="line"></div>
+                    <div class="small">NPR price</div>
+                    <div class="card-row"><span>Wishlist</span><span>View</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="product" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Product Detail</h2>
+              <p class="screen-note">Product decision screen with gallery, variants, stock, and purchase actions.</p>
+            </div>
+            <span class="tag">Customer</span>
+          </div>
+          <div class="canvas product-detail">
+            <div class="gallery">
+              <div class="thumbs">
+                <div class="thumbnail"></div>
+                <div class="thumbnail"></div>
+                <div class="thumbnail"></div>
+                <div class="thumbnail"></div>
+              </div>
+              <div class="image-box">Large product gallery image</div>
+            </div>
+            <div class="form-panel">
+              <p class="section-title">Product name and details</p>
+              <div class="line"></div>
+              <div class="line medium"></div>
+              <p class="price">NPR 25,000</p>
+              <div class="nav-strip">
+                <div class="pill">Size 6</div>
+                <div class="pill">Size 7</div>
+                <div class="pill">Size 8</div>
+              </div>
+              <div class="section-title section">Quantity</div>
+              <div class="quantity">
+                <div class="ghost-button">-</div>
+                <div class="field">1</div>
+                <div class="ghost-button">+</div>
+              </div>
+              <div class="card-row">
+                <div class="button">Add to cart</div>
+                <div class="ghost-button">Wishlist</div>
+              </div>
+              <div class="section">
+                <div class="status">In stock</div>
+                <div class="status">Secure eSewa checkout</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="cart" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Cart</h2>
+              <p class="screen-note">Review quantities, coupon, and total before checkout.</p>
+            </div>
+            <span class="tag">Customer</span>
+          </div>
+          <div class="canvas split">
+            <div class="admin-panel">
+              <p class="section-title">Cart items</p>
+              <div class="cart-item">
+                <div class="thumbnail"></div>
+                <div>
+                  <strong>Jewellery item</strong>
+                  <p class="small">Variant and stock note</p>
+                </div>
+                <div class="actions">
+                  <div class="ghost-button">-</div>
+                  <div class="field">1</div>
+                  <div class="ghost-button">+</div>
+                  <div class="ghost-button">Remove</div>
+                </div>
+              </div>
+              <div class="cart-item">
+                <div class="thumbnail"></div>
+                <div>
+                  <strong>Jewellery item</strong>
+                  <p class="small">Variant and stock note</p>
+                </div>
+                <div class="actions">
+                  <div class="ghost-button">-</div>
+                  <div class="field">2</div>
+                  <div class="ghost-button">+</div>
+                  <div class="ghost-button">Remove</div>
+                </div>
+              </div>
+            </div>
+            <aside class="summary-panel">
+              <p class="section-title">Order summary</p>
+              <div class="field">Coupon code</div>
+              <div class="button">Apply coupon</div>
+              <div class="line"></div>
+              <div class="card-row"><span>Subtotal</span><strong>NPR amount</strong></div>
+              <div class="card-row"><span>Shipping</span><strong>NPR amount</strong></div>
+              <div class="card-row"><span>Total</span><strong>NPR amount</strong></div>
+              <div class="button section">Continue to checkout</div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="checkout" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Checkout</h2>
+              <p class="screen-note">Collect shipping details and initiate eSewa payment.</p>
+            </div>
+            <span class="tag">Customer</span>
+          </div>
+          <div class="canvas split">
+            <div class="form-panel">
+              <p class="section-title">Shipping details</p>
+              <div class="grid-2">
+                <div class="field">First name</div>
+                <div class="field">Last name</div>
+              </div>
+              <div class="field">Email</div>
+              <div class="field">Phone</div>
+              <div class="field">Street address</div>
+              <div class="grid-3">
+                <div class="field">City</div>
+                <div class="field">State</div>
+                <div class="field">ZIP</div>
+              </div>
+              <div class="field">Use saved account details checkbox</div>
+            </div>
+            <aside class="summary-panel">
+              <p class="section-title">Checkout summary</p>
+              <div class="card">Items and quantities</div>
+              <div class="card-row"><span>Subtotal</span><strong>NPR amount</strong></div>
+              <div class="card-row"><span>Tax</span><strong>NPR amount</strong></div>
+              <div class="card-row"><span>Total</span><strong>NPR amount</strong></div>
+              <div class="button section">Pay with eSewa</div>
+              <p class="small section">Order is created after payment verification.</p>
+            </aside>
+          </div>
+        </section>
+
+        <section id="confirmation" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Order Confirmation</h2>
+              <p class="screen-note">Payment result, order number, and next steps.</p>
+            </div>
+            <span class="tag">Customer</span>
+          </div>
+          <div class="canvas">
+            <div class="summary-panel">
+              <div class="status">Payment verified</div>
+              <h3>Thank you for your order</h3>
+              <div class="line medium"></div>
+              <div class="grid-3 section">
+                <div class="metric">Order number<strong>RJ-000123</strong></div>
+                <div class="metric">Total<strong>NPR amount</strong></div>
+                <div class="metric">Payment<strong>eSewa</strong></div>
+              </div>
+              <div class="steps section">
+                <div class="step">Placed</div>
+                <div class="step">Processing</div>
+                <div class="step">Shipped</div>
+                <div class="step">Delivered</div>
+              </div>
+              <div class="card-row">
+                <div class="button">View order</div>
+                <div class="ghost-button">Continue shopping</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="account" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Customer Dashboard</h2>
+              <p class="screen-note">Account hub for profile, orders, cart, and wishlist.</p>
+            </div>
+            <span class="tag">Account</span>
+          </div>
+          <div class="canvas">
+            <div class="grid-3">
+              <div class="metric">Profile<strong>User name</strong></div>
+              <div class="metric">Cart<strong>NPR amount</strong></div>
+              <div class="metric">Wishlist<strong>Saved items</strong></div>
+            </div>
+            <div class="grid-2 section">
+              <div class="admin-panel">
+                <p class="section-title">Recent orders</p>
+                <div class="table">
+                  <div class="table-row header"><div>Order</div><div>Status</div><div>Total</div><div>Date</div><div>Action</div></div>
+                  <div class="table-row"><div>RJ-001</div><div><span class="status">Processing</span></div><div>NPR amount</div><div>Date</div><div>View</div></div>
+                  <div class="table-row"><div>RJ-002</div><div><span class="status">Delivered</span></div><div>NPR amount</div><div>Date</div><div>View</div></div>
+                </div>
+              </div>
+              <div class="admin-panel">
+                <p class="section-title">Quick actions</p>
+                <div class="grid-2">
+                  <div class="button">My orders</div>
+                  <div class="button">Edit profile</div>
+                  <div class="ghost-button">Addresses</div>
+                  <div class="ghost-button">Payment info</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="orders" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Orders & Tracking</h2>
+              <p class="screen-note">Order list plus tracking detail for one selected order.</p>
+            </div>
+            <span class="tag">Account</span>
+          </div>
+          <div class="canvas grid-2">
+            <div class="admin-panel">
+              <p class="section-title">Orders list</p>
+              <div class="table">
+                <div class="table-row header"><div>Order</div><div>Status</div><div>Total</div><div>Date</div><div>View</div></div>
+                <div class="table-row"><div>RJ-001</div><div><span class="status">Processing</span></div><div>NPR amount</div><div>Date</div><div>Open</div></div>
+                <div class="table-row"><div>RJ-002</div><div><span class="status">Delivered</span></div><div>NPR amount</div><div>Date</div><div>Open</div></div>
+              </div>
+            </div>
+            <div class="summary-panel">
+              <p class="section-title">Selected order detail</p>
+              <div class="steps">
+                <div class="step">Placed</div>
+                <div class="step">Processing</div>
+                <div class="step">Shipped</div>
+                <div class="step">Delivered</div>
+              </div>
+              <div class="section card">Item list with quantities and prices</div>
+              <div class="card-row"><span>Total</span><strong>NPR amount</strong></div>
+              <div class="ghost-button section">Contact support</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="admin-dashboard" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Admin Dashboard</h2>
+              <p class="screen-note">Operational overview for orders, revenue, users, and products.</p>
+            </div>
+            <span class="tag">Admin</span>
+          </div>
+          <div class="canvas admin-layout">
+            <aside class="sidebar-menu">
+              <div class="pill">Dashboard</div>
+              <div class="pill">Products</div>
+              <div class="pill">Orders</div>
+              <div class="pill">Reviews</div>
+            </aside>
+            <div class="admin-body">
+              <div class="admin-topbar">
+                <div class="logo">Admin logo</div>
+                <div class="input">Search admin records</div>
+                <div class="pill">Notifications</div>
+                <div class="pill">Profile</div>
+              </div>
+              <div class="grid-4 section">
+                <div class="metric">Total sales<strong>NPR</strong></div>
+                <div class="metric">Orders<strong>Count</strong></div>
+                <div class="metric">Customers<strong>Count</strong></div>
+                <div class="metric">Products<strong>Count</strong></div>
+              </div>
+              <div class="grid-2 section">
+                <div class="admin-panel">Recent orders table</div>
+                <div class="admin-panel">Low stock alerts</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="admin-products" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Product Management</h2>
+              <p class="screen-note">List, search, add, edit, delete, and monitor product stock.</p>
+            </div>
+            <span class="tag">Admin</span>
+          </div>
+          <div class="canvas admin-layout">
+            <aside class="sidebar-menu">
+              <div class="pill">Dashboard</div>
+              <div class="pill">Products</div>
+              <div class="pill">Orders</div>
+            </aside>
+            <div class="admin-body">
+              <div class="card-row">
+                <div class="input">Search products</div>
+                <div class="button">Add product</div>
+              </div>
+              <div class="table section">
+                <div class="table-row header"><div>Product</div><div>Category</div><div>Price</div><div>Stock</div><div>Actions</div></div>
+                <div class="table-row"><div>Ring name</div><div>Rings</div><div>NPR amount</div><div><span class="status">In stock</span></div><div>Edit Delete</div></div>
+                <div class="table-row"><div>Necklace name</div><div>Necklaces</div><div>NPR amount</div><div><span class="status">Low</span></div><div>Edit Delete</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="admin-product-form" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Product Form</h2>
+              <p class="screen-note">Add/edit form for details, images, NPR pricing, variants, and stock.</p>
+            </div>
+            <span class="tag">Admin</span>
+          </div>
+          <div class="canvas grid-2">
+            <div class="form-panel">
+              <p class="section-title">Product details</p>
+              <div class="field">Product name</div>
+              <div class="field">Slug</div>
+              <div class="textarea">Description</div>
+              <div class="grid-2">
+                <div class="field">Category</div>
+                <div class="field">Material</div>
+              </div>
+              <div class="grid-3">
+                <div class="field">Price (NPR)</div>
+                <div class="field">Old price (NPR)</div>
+                <div class="field">Cost price (NPR)</div>
+              </div>
+            </div>
+            <div class="form-panel">
+              <p class="section-title">Images and variants</p>
+              <div class="image-box">Upload product images</div>
+              <div class="table section">
+                <div class="table-row header"><div>Variant</div><div>SKU</div><div>Stock</div><div>Status</div><div>Action</div></div>
+                <div class="table-row"><div>Size 6</div><div>SKU</div><div>10</div><div>Active</div><div>Remove</div></div>
+              </div>
+              <div class="card-row">
+                <div class="ghost-button">Add variant</div>
+                <div class="button">Save product</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="admin-orders" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Order Management</h2>
+              <p class="screen-note">View orders, inspect details, update status, and track payment.</p>
+            </div>
+            <span class="tag">Admin</span>
+          </div>
+          <div class="canvas grid-2">
+            <div class="admin-panel">
+              <p class="section-title">Orders table</p>
+              <div class="table">
+                <div class="table-row header"><div>Order</div><div>Customer</div><div>Total</div><div>Status</div><div>Action</div></div>
+                <div class="table-row"><div>RJ-001</div><div>Email</div><div>NPR</div><div><span class="status">Pending</span></div><div>View</div></div>
+                <div class="table-row"><div>RJ-002</div><div>Email</div><div>NPR</div><div><span class="status">Shipped</span></div><div>View</div></div>
+              </div>
+            </div>
+            <div class="summary-panel">
+              <p class="section-title">Order detail and status update</p>
+              <div class="field">Current status dropdown</div>
+              <div class="field">Tracking number</div>
+              <div class="textarea">Admin note</div>
+              <div class="button">Update order</div>
+              <div class="section card">Items, shipping address, payment status</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="admin-secondary" class="wireframe">
+          <div class="screen-header">
+            <div>
+              <h2>Reviews / Messages / CMS Panel</h2>
+              <p class="screen-note">Compact secondary admin area for feedback and content tasks.</p>
+            </div>
+            <span class="tag">Admin</span>
+          </div>
+          <div class="canvas compact-panel">
+            <div class="admin-panel">
+              <p class="section-title">Customer messages and reviews</p>
+              <div class="card">New customer message with mark reviewed action</div>
+              <div class="card section">Review awaiting approval action</div>
+            </div>
+            <div class="admin-panel">
+              <p class="section-title">CMS pages</p>
+              <div class="table">
+                <div class="table-row header"><div>Page</div><div>Slug</div><div>Status</div><div>Updated</div><div>Actions</div></div>
+                <div class="table-row"><div>About</div><div>/about</div><div>Published</div><div>Date</div><div>View Edit Delete</div></div>
+              </div>
+              <div class="button section">New page</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

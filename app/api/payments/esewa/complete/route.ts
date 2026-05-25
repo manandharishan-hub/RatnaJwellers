@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { jsonError, firstZodMessage } from "@/lib/apiErrors";
 import { buildOrderNumber, centsToCurrency } from "@/lib/utils";
-import { centsToEsewaAmount, decodeEsewaResponse, getEsewaConfig, verifyEsewaResponseSignature } from "@/lib/esewa";
+import { centsToEsewaAmount, checkEsewaTransactionStatus, decodeEsewaResponse, getEsewaConfig, verifyEsewaResponseSignature } from "@/lib/esewa";
 import { connectDB } from "@/lib/mongodb";
 import { decreaseStockForOrder, priceOrderItems } from "@/lib/orderPricing";
+import { markCouponUsed } from "@/lib/coupons";
 import { getCurrentUser } from "@/lib/serverAuth";
 import { serializeOrder } from "@/lib/dto";
 import { orderCreateSchema } from "@/lib/validation";
@@ -11,6 +12,7 @@ import OrderModel from "@/models/Order";
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
+
   const body = await request.json();
   const checkout = body?.checkout;
   const data = typeof body?.data === "string" ? body.data : "";
@@ -40,10 +42,9 @@ export async function POST(request: Request) {
   const parsed = orderCreateSchema.safeParse({
     ...checkout,
     paymentMethod: "esewa",
-    paymentStatus: "paid",
+    paymentStatus: "completed",
     status: "processing",
     transactionId: esewaPayload.transaction_code || esewaPayload.transaction_uuid || "",
-    cardLast4: "",
   });
 
   if (!parsed.success) {
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
   await connectDB();
   let pricedOrder;
   try {
-    pricedOrder = await priceOrderItems(parsed.data.items);
+    pricedOrder = await priceOrderItems(parsed.data.items, parsed.data.couponCode);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to price order.";
     return jsonError(message, 400);
@@ -70,10 +71,33 @@ export async function POST(request: Request) {
     return jsonError(`eSewa amount does not match order total ${centsToCurrency(pricedOrder.total)}.`, 400);
   }
 
+  let statusPayload;
+  try {
+    statusPayload = await checkEsewaTransactionStatus({
+      transactionUuid: esewaPayload.transaction_uuid || "",
+      totalAmount: expectedTotalAmount,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to verify payment with eSewa.";
+    return jsonError(message, 400);
+  }
+
+  if (statusPayload.status !== "COMPLETE") {
+    return jsonError(`eSewa payment status is ${statusPayload.status || "not complete"}.`, 402);
+  }
+
   const transactionId = esewaPayload.transaction_code || esewaPayload.transaction_uuid || parsed.data.transactionId;
   const existingOrder = await OrderModel.findOne({ paymentMethod: "esewa", transactionId }).lean();
   if (existingOrder) {
     return NextResponse.json({ orderId: existingOrder._id.toString(), order: serializeOrder(existingOrder) });
+  }
+
+  try {
+    await decreaseStockForOrder(pricedOrder.orderItems);
+    await markCouponUsed(pricedOrder.coupon?.code);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unable to update stock.";
+    return jsonError(message, 409);
   }
 
   const order = await OrderModel.create({
@@ -84,27 +108,19 @@ export async function POST(request: Request) {
     shippingAddress: parsed.data.shippingAddress,
     billingAddress: parsed.data.billingAddress,
     paymentMethod: "esewa",
-    paymentStatus: "paid",
-    stripePaymentId: "",
+    paymentStatus: "completed",
     transactionId,
-    cardLast4: "",
     shippingMethod: "Standard",
     shippingCost: pricedOrder.shippingCost,
     subtotal: pricedOrder.subtotal,
     tax: pricedOrder.tax,
     discount: pricedOrder.discount,
     total: pricedOrder.total,
-    couponCode: "",
+    totalAmount: pricedOrder.total,
+    couponCode: pricedOrder.coupon?.code ?? "",
     status: "processing",
     statusHistory: [{ status: "processing", timestamp: new Date(), note: "Order created after verified eSewa payment" }],
   });
-
-  try {
-    await decreaseStockForOrder(pricedOrder.orderItems);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to update stock.";
-    return jsonError(message, 409);
-  }
 
   return NextResponse.json({ orderId: order._id.toString(), order: serializeOrder(order.toObject()) }, { status: 201 });
 }

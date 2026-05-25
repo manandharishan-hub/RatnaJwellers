@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useWishlistStore } from "@/hooks/store/wishlistStore";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { centsToCurrency } from "@/lib/utils";
 
 export default function AccountWishlistPage() {
   const items = useWishlistStore((state) => state.items);
@@ -31,11 +32,11 @@ export default function AccountWishlistPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-[#0A1628]">{item.name}</h3>
-                  <p className="text-sm text-slate-600">${(item.price / 100).toFixed(2)}</p>
+                  <p className="text-sm text-slate-600">{centsToCurrency(item.price)}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link href={`/product/${item.productId}`} className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-[#0A1628] transition hover:border-[#C9A84C]">View</Link>
+                <Link href={item.slug ? `/product/${item.slug}` : "/shop"} className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-[#0A1628] transition hover:border-[#C9A84C]">View</Link>
                 <Button onClick={() => removeItem(item.productId)} className="rounded-full bg-red-50 text-red-700 hover:bg-red-100">Remove</Button>
               </div>
             </div>

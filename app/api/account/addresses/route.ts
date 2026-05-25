@@ -38,7 +38,15 @@ export async function POST(request: Request) {
       address.isDefault = false;
     });
   }
-  profile.addresses.push({ ...parsed.data, isDefault: parsed.data.isDefault || profile.addresses.length === 0 });
+  profile.addresses.push({
+    label: parsed.data.label,
+    street: parsed.data.street,
+    city: parsed.data.city,
+    state: parsed.data.state,
+    zip: parsed.data.zip,
+    country: parsed.data.country,
+    isDefault: parsed.data.isDefault || profile.addresses.length === 0,
+  });
   await profile.save();
 
   return NextResponse.json(serializeAddresses(profile.toObject()), { status: 201 });
@@ -58,7 +66,7 @@ export async function PUT(request: Request) {
   const profile = await UserModel.findById(user!.id);
   if (!profile) return jsonError("User not found.", 404);
 
-  const address = profile.addresses.id(parsed.data._id);
+  const address = (profile.addresses as any).id(parsed.data._id);
   if (!address) return jsonError("Address not found.", 404);
 
   if (parsed.data.isDefault) {
@@ -83,7 +91,7 @@ export async function DELETE(request: Request) {
   const profile = await UserModel.findById(user!.id);
   if (!profile) return jsonError("User not found.", 404);
 
-  const address = profile.addresses.id(addressId);
+  const address = (profile.addresses as any).id(addressId);
   if (!address) return jsonError("Address not found.", 404);
   const wasDefault = address.isDefault;
   address.deleteOne();

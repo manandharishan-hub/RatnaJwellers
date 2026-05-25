@@ -1,6 +1,7 @@
 import crypto from "crypto";
 
 export const ESEWA_SIGNED_FIELD_NAMES = "total_amount,transaction_uuid,product_code";
+export const ESEWA_MIN_TOTAL_CENTS = 1000;
 
 export type EsewaResponsePayload = {
   transaction_code?: string;
@@ -12,6 +13,18 @@ export type EsewaResponsePayload = {
   signature?: string;
 };
 
+export type EsewaStatusPayload = {
+  pid?: string;
+  scd?: string;
+  totalAmount?: number;
+  total_amount?: number;
+  status?: string;
+  refId?: string | null;
+  ref_id?: string | null;
+  code?: number;
+  error_message?: string;
+};
+
 function getRequiredEnv(name: string, fallback?: string) {
   const value = process.env[name] || fallback;
   if (!value) {
@@ -20,12 +33,23 @@ function getRequiredEnv(name: string, fallback?: string) {
   return value;
 }
 
+function normalizeEsewaSecretKey(secretKey: string, productCode: string, environment: string) {
+  if (environment === "uat" && productCode === "EPAYTEST" && secretKey === "8gBm/:&EnhH.1/q(") {
+    return "8gBm/:&EnhH.1/q";
+  }
+
+  return secretKey;
+}
+
 export function getEsewaConfig() {
   const environment = process.env.ESEWA_ENV === "production" ? "production" : "uat";
+  const productCode = getRequiredEnv("ESEWA_PRODUCT_CODE", "EPAYTEST");
+  const secretKey = normalizeEsewaSecretKey(getRequiredEnv("ESEWA_SECRET_KEY"), productCode, environment);
+
   return {
     environment,
-    productCode: getRequiredEnv("ESEWA_PRODUCT_CODE", "EPAYTEST"),
-    secretKey: getRequiredEnv("ESEWA_SECRET_KEY"),
+    productCode,
+    secretKey,
     formAction:
       environment === "production"
         ? "https://epay.esewa.com.np/api/epay/main/v2/form"
@@ -33,7 +57,7 @@ export function getEsewaConfig() {
     statusUrl:
       environment === "production"
         ? "https://epay.esewa.com.np/api/epay/transaction/status/"
-        : "https://uat.esewa.com.np/api/epay/transaction/status/",
+        : "https://rc.esewa.com.np/api/epay/transaction/status/",
   };
 }
 
@@ -59,6 +83,28 @@ export function generateEsewaSignature({
 export function createEsewaTransactionUuid() {
   const randomPart = crypto.randomBytes(4).toString("hex").toUpperCase();
   return `RJ-${Date.now()}-${randomPart}`;
+}
+
+export async function checkEsewaTransactionStatus({
+  transactionUuid,
+  totalAmount,
+}: {
+  transactionUuid: string;
+  totalAmount: string;
+}) {
+  const config = getEsewaConfig();
+  const url = new URL(config.statusUrl);
+  url.searchParams.set("product_code", config.productCode);
+  url.searchParams.set("total_amount", totalAmount);
+  url.searchParams.set("transaction_uuid", transactionUuid);
+
+  const response = await fetch(url.toString(), { cache: "no-store" });
+  const payload = (await response.json().catch(() => ({}))) as EsewaStatusPayload;
+  if (!response.ok || payload.error_message) {
+    throw new Error(payload.error_message || "Unable to verify payment with eSewa.");
+  }
+
+  return payload;
 }
 
 export function decodeEsewaResponse(data: string): EsewaResponsePayload {

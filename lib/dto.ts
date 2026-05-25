@@ -26,7 +26,10 @@ export function serializeProduct(product: LeanDoc<Partial<ProductDoc>>) {
     careInstructions: product.careInstructions,
     price: product.price,
     comparePrice: product.comparePrice,
-    images: product.images ?? [],
+    images: (product.images ?? []).map((image: any) => ({
+      url: image.url ?? "",
+      isPrimary: Boolean(image.isPrimary),
+    })),
     category: stringifyId(product.category),
     subCategory: product.subCategory ? stringifyId(product.subCategory) : null,
     tags: product.tags ?? [],
@@ -34,7 +37,10 @@ export function serializeProduct(product: LeanDoc<Partial<ProductDoc>>) {
     gemstone: product.gemstone,
     weight: product.weight,
     occasion: product.occasion,
-    variants: product.variants ?? [],
+    variants: (product.variants ?? []).map((variant: any) => ({
+      size: variant.size ?? "",
+      stock: variant.stock ?? 0,
+    })),
     totalStock: product.totalStock,
     isPublished: product.isPublished,
     isFeatured: product.isFeatured,
@@ -42,8 +48,8 @@ export function serializeProduct(product: LeanDoc<Partial<ProductDoc>>) {
     isBestSeller: product.isBestSeller,
     averageRating: product.averageRating,
     reviewCount: product.reviewCount,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
+    createdAt: product.createdAt?.toISOString?.() ?? product.createdAt,
+    updatedAt: product.updatedAt?.toISOString?.() ?? product.updatedAt,
   };
 }
 
@@ -110,6 +116,19 @@ export function serializeWishlistProduct(product: LeanDoc<Partial<ProductDoc>>) 
   };
 }
 
+export function serializeCartProduct(product: LeanDoc<Partial<ProductDoc>>, quantity: number, variant = "") {
+  const primaryImage = product.images?.find((image) => image.isPrimary)?.url ?? product.images?.[0]?.url ?? "";
+  return {
+    productId: stringifyId(product._id),
+    name: product.name ?? "",
+    image: primaryImage,
+    price: product.price ?? 0,
+    quantity,
+    variant,
+    slug: product.slug ?? "",
+  };
+}
+
 export function serializeOrder(order: LeanDoc<Partial<OrderDoc>>) {
   return {
     _id: stringifyId(order._id),
@@ -129,7 +148,6 @@ export function serializeOrder(order: LeanDoc<Partial<OrderDoc>>) {
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
     transactionId: order.transactionId,
-    cardLast4: order.cardLast4,
     shippingMethod: order.shippingMethod,
     shippingCost: order.shippingCost,
     subtotal: order.subtotal,

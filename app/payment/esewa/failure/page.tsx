@@ -10,7 +10,10 @@ export default function EsewaFailurePage() {
         </div>
         <h1 className="mt-5 text-3xl font-semibold text-[#0A1628]">eSewa payment was not completed</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Your order has not been created. You can return to checkout and try again.
+          eSewa did not confirm this payment. This can happen if the payment was cancelled, the session expired, or the eSewa test payment was not finished with the token.
+        </p>
+        <p className="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          Your order has not been created and your cart is still saved.
         </p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <Link href="/checkout" className="inline-flex items-center justify-center rounded-full bg-[#0A1628] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-900">

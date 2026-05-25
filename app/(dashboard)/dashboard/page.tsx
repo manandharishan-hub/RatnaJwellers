@@ -1,9 +1,11 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Gem, Package, UserRound } from "lucide-react";
+import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { UserDashboardClientSummary } from "@/components/dashboard/UserDashboardClientSummary";
 import { connectDB } from "@/lib/mongodb";
 import { getCurrentUser } from "@/lib/serverAuth";
+import { formatOrderStatus, trackingStepIndex, trackingSteps } from "@/lib/orderStatus";
 import { centsToCurrency } from "@/lib/utils";
 import OrderModel from "@/models/Order";
 import ProductModel from "@/models/Product";
@@ -32,7 +34,9 @@ export default async function UserDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F6F2] px-5 py-6 md:px-8 lg:px-12">
-      <section className="mx-auto max-w-7xl">
+      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+        <DashboardSidebar />
+        <section>
         <div className="rounded-lg bg-[#0A1628] p-6 text-white md:p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#D8B35A]">User dashboard</p>
           <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -66,12 +70,15 @@ export default async function UserDashboardPage() {
           <UserDashboardClientSummary />
         </div>
 
-        <div className="mt-6 grid gap-3 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-3 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 lg:grid-cols-7">
           {[
             { href: "/shop", label: "Continue shopping" },
             { href: "/cart", label: "View cart" },
             { href: "/account/orders", label: "My orders" },
+            { href: "#order-tracking", label: "Track order" },
             { href: "/account/profile", label: "Edit profile" },
+            { href: "/account/addresses", label: "Saved addresses" },
+            { href: "/account/payment-methods", label: "Payment methods" },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="rounded-lg border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-[#0A1628] transition hover:border-[#D8B35A] hover:bg-[#FBFAF7]">
               {item.label}
@@ -80,6 +87,37 @@ export default async function UserDashboardPage() {
         </div>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <div id="order-tracking" className="rounded-lg border border-slate-200 bg-white shadow-sm xl:col-span-2">
+            <div className="border-b border-slate-200 px-5 py-4">
+              <p className="text-sm font-semibold uppercase text-[#9A7627]">Order tracking</p>
+              <h2 className="text-xl font-semibold text-[#0A1628]">Track your product status</h2>
+            </div>
+            <div className="divide-y divide-slate-200">
+              {orders.slice(0, 3).map((order: any) => {
+                const activeStep = trackingStepIndex(order.status);
+                return (
+                  <Link key={`tracking-${order._id.toString()}`} href={`/account/orders/${order._id.toString()}`} className="block px-5 py-5 transition hover:bg-[#FBFAF7]">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-semibold text-[#0A1628]">{order.orderNumber}</p>
+                        <p className="text-sm text-slate-600">{formatOrderStatus(order.status)}{order.trackingNumber ? ` · Tracking: ${order.trackingNumber}` : ""}</p>
+                      </div>
+                      <p className="text-sm font-semibold text-[#0A1628]">{centsToCurrency(order.total)}</p>
+                    </div>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-4">
+                      {trackingSteps.map((step, index) => (
+                        <div key={step} className={`rounded-full px-3 py-2 text-center text-xs font-semibold ${activeStep >= index ? "bg-[#0A1628] text-white" : "bg-slate-100 text-slate-500"}`}>
+                          {formatOrderStatus(step)}
+                        </div>
+                      ))}
+                    </div>
+                  </Link>
+                );
+              })}
+              {orders.length === 0 && <div className="px-5 py-10 text-center text-slate-500">No orders to track yet.</div>}
+            </div>
+          </div>
+
           <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <p className="text-sm font-semibold uppercase text-[#9A7627]">My orders</p>
@@ -90,7 +128,7 @@ export default async function UserDashboardPage() {
                 <Link key={order._id.toString()} href={`/account/orders/${order._id.toString()}`} className="grid gap-2 px-5 py-4 transition hover:bg-[#FBFAF7] sm:grid-cols-[1fr_auto] sm:items-center">
                   <div>
                     <p className="font-semibold text-[#0A1628]">{order.orderNumber}</p>
-                    <p className="text-sm capitalize text-slate-600">{order.status} · {order.paymentStatus}</p>
+                    <p className="text-sm capitalize text-slate-600">{formatOrderStatus(order.status)} · {order.paymentStatus}</p>
                   </div>
                   <p className="font-semibold text-[#0A1628]">{centsToCurrency(order.total)}</p>
                 </Link>
@@ -117,7 +155,9 @@ export default async function UserDashboardPage() {
             </div>
           </div>
         </section>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
+

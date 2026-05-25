@@ -58,11 +58,19 @@ export type CartItem = {
   variant?: string;
 };
 
+export type AppliedCoupon = {
+  code: string;
+  type: "percentage" | "fixed";
+  value: number;
+  discount: number;
+};
+
 export type WishlistItem = {
   productId: string;
   name: string;
   image: string;
   price: number;
+  slug?: string;
 };
 
 export type CheckoutFormData = {
@@ -79,7 +87,7 @@ export type CheckoutFormData = {
   useBillingAsShipping: boolean;
 };
 
-export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+export type OrderStatus = "pending" | "processing" | "packed" | "out-for-delivery" | "shipped" | "delivered" | "cancelled" | "refunded";
 
 export type OrderAddress = Omit<CheckoutFormData, "shippingMethod" | "useBillingAsShipping"> & {
   email?: string;
@@ -105,7 +113,6 @@ export type OrderSummary = {
   paymentMethod: string;
   paymentStatus: "pending" | "paid" | "failed";
   transactionId?: string;
-  cardLast4?: string;
   shippingMethod: string;
   shippingCost: number;
   subtotal: number;

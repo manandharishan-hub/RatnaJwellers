@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Ratna Jewels
 
-## Getting Started
+Ratna Jewels is a Next.js ecommerce app for browsing jewellery, saving wishlist items, managing a cart, checking out with eSewa, tracking orders, and administering products/orders.
 
-First, run the development server:
+## Stack
+
+- Next.js App Router
+- TypeScript
+- MongoDB with Mongoose
+- NextAuth credentials auth
+- Tailwind CSS
+- eSewa checkout
+- Firebase/Admin upload support
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create `.env.local` with the values used by the app:
+
+```bash
+MONGODB_URI=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+ADMIN_EMAIL=admin123@gmail.com
+ADMIN_PASSWORD=admin123
+EMAIL_VERIFICATION_REQUIRED=false
+ESEWA_ENV=sandbox
+ESEWA_PRODUCT_CODE=
+ESEWA_SECRET_KEY=
+```
+
+3. Start development:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Seed data when needed:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+npm run db:seed
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Main Flows
 
-## Learn More
+- `/` redirects to the user dashboard flow.
+- Logged-out customers are redirected to `/login` for account, cart, wishlist, checkout, and dashboard pages.
+- Cart and wishlist actions require login and sync to MongoDB.
+- Checkout uses eSewa only; orders are created after verified eSewa payment.
+- Admin pages require the configured admin credentials.
 
-To learn more about Next.js, take a look at the following resources:
+## Verification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npx tsc --noEmit
+npm run test:e2e
+```

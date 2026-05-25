@@ -52,7 +52,10 @@ export default function RegisterPage() {
 
     const data = await response.json().catch(() => null);
     const callbackUrl = getSafeCallbackUrl();
-    const query = callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : "";
+    const queryParams = new URLSearchParams();
+    if (callbackUrl) queryParams.set("callbackUrl", callbackUrl);
+    queryParams.set("email", values.email.trim().toLowerCase());
+    const query = `?${queryParams.toString()}`;
     router.push(data?.requiresVerification ? `/verify-email${query}` : `/login${query}`);
   }
 
@@ -71,17 +74,17 @@ export default function RegisterPage() {
         </div>
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="yourname@gmail.com" {...register("email")} />
+          <Input id="email" type="email" autoComplete="email" placeholder="yourname@gmail.com" {...register("email")} />
           {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" placeholder="Create a strong password" {...register("password")} />
+          <Input id="password" type="password" autoComplete="new-password" placeholder="Create a strong password" {...register("password")} />
           {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
         </div>
         <div>
           <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input id="confirmPassword" type="password" {...register("confirmPassword")} placeholder="Repeat your password" />
+          <Input id="confirmPassword" type="password" autoComplete="new-password" {...register("confirmPassword")} placeholder="Repeat your password" />
           {errors.confirmPassword && <p className="mt-2 text-sm text-red-600">{errors.confirmPassword.message}</p>}
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}

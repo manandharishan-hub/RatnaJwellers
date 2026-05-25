@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/serverAuth";
 import { connectDB } from "@/lib/mongodb";
 import OrderModel from "@/models/Order";
 import { centsToCurrency } from "@/lib/utils";
+import { formatOrderStatus } from "@/lib/orderStatus";
 
 async function getOrders(userId: string) {
   await connectDB();
@@ -45,7 +46,7 @@ export default async function AccountOrdersPage() {
               {orders.map((order) => (
                 <tr key={order._id.toString()}>
                   <td className="px-6 py-4 font-semibold text-[#0A1628]">{order.orderNumber}</td>
-                  <td className="px-6 py-4 text-slate-600">{order.status}</td>
+                  <td className="px-6 py-4 text-slate-600">{formatOrderStatus(order.status)}</td>
                   <td className="px-6 py-4 text-slate-600">{order.paymentStatus}</td>
                   <td className="px-6 py-4 text-slate-900">{centsToCurrency(order.total)}</td>
                   <td className="px-6 py-4 text-right">

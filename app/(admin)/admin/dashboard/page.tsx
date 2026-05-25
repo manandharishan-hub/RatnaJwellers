@@ -1,12 +1,12 @@
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight, Boxes, Gem, PackagePlus, ReceiptText, TrendingUp, Users } from "lucide-react";
+import { ArrowRight, Gem, PackagePlus, ReceiptText, TrendingUp, Users, AlertCircle, Clock, BarChart3 } from "lucide-react";
 import { requireAdminPage } from "@/lib/adminGuard";
 import { connectDB } from "@/lib/mongodb";
 import { centsToCurrency } from "@/lib/utils";
 import OrderModel from "@/models/Order";
 import ProductModel from "@/models/Product";
 import UserModel from "@/models/User";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,7 @@ async function getAdminStats() {
     await connectDB();
     const [revenueAgg, totalUsers, totalProducts, totalOrders, pendingOrders, recentOrders, lowStockProducts, lowStockCount] = await Promise.all([
       OrderModel.aggregate([
-        { $match: { paymentStatus: "paid" } },
+        { $match: { paymentStatus: { $in: ["paid", "completed"] } } },
         { $group: { _id: null, revenue: { $sum: "$total" } } },
       ]),
       UserModel.countDocuments({ role: { $ne: "admin" } }),
@@ -53,154 +53,166 @@ async function getAdminStats() {
   }
 }
 
-const adminLinks = [
-  { href: "/admin/products", label: "Product management", icon: Gem },
-  { href: "/admin/orders", label: "Order management", icon: ReceiptText },
-  { href: "/admin/users", label: "User management", icon: Users },
-];
+function DashboardContent({ stats }: { stats: Awaited<ReturnType<typeof getAdminStats>> }) {
+  const statCards = [
+    { label: "Total Sales", value: centsToCurrency(stats.totalRevenue), icon: TrendingUp, color: "from-green-500 to-emerald-500" },
+    { label: "Total Orders", value: stats.totalOrders.toString(), icon: ReceiptText, color: "from-blue-500 to-cyan-500" },
+    { label: "Active Customers", value: stats.totalUsers.toString(), icon: Users, color: "from-purple-500 to-pink-500" },
+    { label: "Products", value: stats.totalProducts.toString(), icon: Gem, color: "from-yellow-500 to-orange-500" },
+    { label: "Pending Orders", value: stats.pendingOrders.toString(), icon: Clock, color: "from-orange-500 to-red-500" },
+    { label: "Low Stock Alerts", value: stats.lowStockCount.toString(), icon: AlertCircle, color: "from-red-500 to-pink-500" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col justify-between md:flex-row md:items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+          <p className="text-gray-600 mt-2">Welcome back! Here is your store performance.</p>
+        </div>
+        <Link
+          href="/admin/products/new"
+          className="mt-4 md:mt-0 inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <PackagePlus className="w-4 h-4" />
+          Add Product
+        </Link>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {statCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div key={card.label} className="bg-white rounded-lg shadow p-6 border border-gray-200">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">{card.label}</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-2">{card.value}</p>
+                </div>
+                <div className={`bg-linear-to-br ${card.color} p-3 rounded-lg`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Recent Orders & Low Stock */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-lg shadow border border-gray-200">
+          <div className="flex justify-between items-center p-6 border-b border-gray-200">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
+              <p className="text-sm text-gray-500">Latest checkout activity</p>
+            </div>
+            <Link href="/admin/orders" className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1">
+              View All
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-700">Order ID</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-700">Customer</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-700">Status</th>
+                  <th className="px-6 py-3 text-left font-semibold text-gray-700">Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {stats.recentOrders.map((order: any) => (
+                  <tr key={order._id.toString()} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 font-medium text-gray-900">{order.orderNumber}</td>
+                    <td className="px-6 py-4 text-gray-600">{order.customerEmail}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                        order.status === "delivered" ? "bg-green-100 text-green-800" :
+                        order.status === "shipped" ? "bg-blue-100 text-blue-800" :
+                        order.status === "processing" ? "bg-yellow-100 text-yellow-800" :
+                        "bg-gray-100 text-gray-800"
+                      }`}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900">{centsToCurrency(order.total)}</td>
+                  </tr>
+                ))}
+                {stats.recentOrders.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-10 text-center text-gray-500">No orders yet</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Low Stock Products */}
+        <div className="bg-white rounded-lg shadow border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Low Stock Alerts</h2>
+            <p className="text-sm text-gray-500">Products below 5 units</p>
+          </div>
+          <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+            {stats.lowStockProducts.map((product: any) => (
+              <div key={product._id.toString()} className="p-6 hover:bg-gray-50 transition-colors">
+                <p className="font-medium text-gray-900">{product.name}</p>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-sm text-gray-500">{product.material}</p>
+                  <span className="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">
+                    {product.totalStock} left
+                  </span>
+                </div>
+              </div>
+            ))}
+            {stats.lowStockProducts.length === 0 && (
+              <div className="p-6 text-center text-gray-500">No low stock items</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Pending Deliveries */}
+      <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link href="/admin/orders?status=pending" className="p-4 border border-gray-200 rounded-lg hover:bg-blue-50 transition-colors">
+            <Clock className="w-6 h-6 text-blue-600 mb-2" />
+            <p className="font-medium text-gray-900">Pending Orders</p>
+            <p className="text-sm text-gray-500">{stats.pendingOrders} orders waiting</p>
+          </Link>
+          <Link href="/admin/products" className="p-4 border border-gray-200 rounded-lg hover:bg-green-50 transition-colors">
+            <Gem className="w-6 h-6 text-green-600 mb-2" />
+            <p className="font-medium text-gray-900">All Products</p>
+            <p className="text-sm text-gray-500">{stats.totalProducts} in catalog</p>
+          </Link>
+          <Link href="/admin/users" className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 transition-colors">
+            <Users className="w-6 h-6 text-purple-600 mb-2" />
+            <p className="font-medium text-gray-900">Customers</p>
+            <p className="text-sm text-gray-500">{stats.totalUsers} registered</p>
+          </Link>
+          <Link href="/admin/analytics" className="p-4 border border-gray-200 rounded-lg hover:bg-orange-50 transition-colors">
+            <BarChart3 className="w-6 h-6 text-orange-600 mb-2" />
+            <p className="font-medium text-gray-900">Analytics</p>
+            <p className="text-sm text-gray-500">View reports</p>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default async function AdminDashboardPage() {
   await requireAdminPage();
   const stats = await getAdminStats();
-  const statCards = [
-    { label: "Total users", value: stats.totalUsers.toString(), icon: Users },
-    { label: "Jewellery products", value: stats.totalProducts.toString(), icon: Gem },
-    { label: "Total orders", value: stats.totalOrders.toString(), icon: ReceiptText },
-    { label: "Revenue", value: centsToCurrency(stats.totalRevenue), icon: TrendingUp },
-    { label: "Pending orders", value: stats.pendingOrders.toString(), icon: PackagePlus },
-    { label: "Low-stock products", value: stats.lowStockCount.toString(), icon: Boxes },
-  ];
 
   return (
-    <div className="min-h-screen bg-[#F8F6F2]">
-      <div className="grid lg:grid-cols-[260px_1fr]">
-        <aside className="border-b border-slate-200 bg-white px-5 py-5 lg:min-h-screen lg:border-b-0 lg:border-r">
-          <Link href="/admin/dashboard" aria-label="Ratna admin dashboard" className="inline-flex items-center gap-3">
-            <Image src="/logo.png" alt="Ratna Jewels" width={112} height={42} className="h-8 w-auto object-contain" />
-            <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#0A1628]">Admin</span>
-          </Link>
-          <nav className="mt-8 grid gap-2">
-            {adminLinks.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link key={item.href} href={item.href} className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-slate-700 transition hover:bg-[#FBFAF7] hover:text-[#9A7627]">
-                  <Icon size={18} />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </aside>
-        <main className="px-5 py-6 md:px-8 lg:px-10">
-          <header className="flex flex-col gap-4 border-b border-slate-200 pb-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#9A7627]">Admin dashboard</p>
-              <h1 className="mt-2 font-serif text-4xl font-semibold text-[#0A1628]">Jewellery store overview</h1>
-              <p className="mt-2 text-slate-600">Live users, jewellery products, orders, stock, and sales from MongoDB.</p>
-            </div>
-            <Link href="/admin/products/new" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0A1628] px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-900">
-              <PackagePlus size={17} />
-              Add jewellery
-            </Link>
-          </header>
-
-          {stats.isOffline && (
-            <div className="mt-5 rounded-lg border border-[#D8B35A]/50 bg-[#FFF8E6] px-4 py-3 text-sm text-[#6F5217]">
-              MongoDB is not reachable. Statistics will populate automatically when the database connection is available.
-            </div>
-          )}
-
-          <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {statCards.map((card) => {
-              const Icon = card.icon;
-              return (
-                <article key={card.label} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-slate-500">{card.label}</p>
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0A1628] text-[#D8B35A]">
-                      <Icon size={19} />
-                    </span>
-                  </div>
-                  <p className="mt-5 text-3xl font-semibold text-[#0A1628]">{card.value}</p>
-                </article>
-              );
-            })}
-          </section>
-
-          <section className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-            <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-                <div>
-                  <p className="text-sm font-semibold uppercase text-[#9A7627]">Recent orders</p>
-                  <h2 className="text-xl font-semibold text-[#0A1628]">Latest checkout activity</h2>
-                </div>
-                <Link href="/admin/orders" className="hidden items-center gap-2 text-sm font-semibold text-[#0A1628] sm:inline-flex">
-                  Manage
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-                    <tr>
-                      <th className="px-5 py-3">Order</th>
-                      <th className="px-5 py-3">Customer</th>
-                      <th className="px-5 py-3">Status</th>
-                      <th className="px-5 py-3">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {stats.recentOrders.map((order: any) => (
-                      <tr key={order._id.toString()}>
-                        <td className="px-5 py-4 font-semibold text-[#0A1628]">{order.orderNumber}</td>
-                        <td className="px-5 py-4 text-slate-600">{order.customerEmail}</td>
-                        <td className="px-5 py-4 capitalize text-slate-600">{order.status}</td>
-                        <td className="px-5 py-4 text-slate-600">{centsToCurrency(order.total)}</td>
-                      </tr>
-                    ))}
-                    {stats.recentOrders.length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="px-5 py-10 text-center text-slate-500">No orders available yet.</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-              <div className="border-b border-slate-200 px-5 py-4">
-                <p className="text-sm font-semibold uppercase text-[#9A7627]">Inventory</p>
-                <h2 className="text-xl font-semibold text-[#0A1628]">Low-stock jewellery</h2>
-              </div>
-              <div className="divide-y divide-slate-200">
-                {stats.lowStockProducts.map((product: any) => (
-                  <div key={product._id.toString()} className="flex items-center justify-between gap-4 px-5 py-4">
-                    <div>
-                      <p className="font-semibold text-[#0A1628]">{product.name}</p>
-                      <p className="text-sm text-slate-500">{product.material} · {product.gemstone}</p>
-                    </div>
-                    <span className="rounded-full bg-[#FFF8E6] px-3 py-1 text-sm font-semibold text-[#6F5217]">{product.totalStock} left</span>
-                  </div>
-                ))}
-                {stats.lowStockProducts.length === 0 && <div className="px-5 py-10 text-center text-slate-500">No low-stock items.</div>}
-              </div>
-            </div>
-          </section>
-
-          <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold uppercase text-[#9A7627]">Management</p>
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
-              {adminLinks.map((item) => (
-                <Link key={item.href} href={item.href} className="flex items-center justify-between rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-[#0A1628] transition hover:border-[#D8B35A] hover:bg-[#FBFAF7]">
-                  {item.label}
-                  <ArrowRight size={16} />
-                </Link>
-              ))}
-            </div>
-          </section>
-        </main>
-      </div>
-    </div>
+    <AdminLayout>
+      <DashboardContent stats={stats} />
+    </AdminLayout>
   );
 }

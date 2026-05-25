@@ -1,14 +1,47 @@
-import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
-import { getCurrentUser } from "@/lib/serverAuth";
+import { requireAdminPage } from "@/lib/adminGuard";
 import CategoryModel from "@/models/Category";
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { CategoryManager } from "@/components/admin/CategoryManager";
+import { serializeCategory } from "@/lib/dto";
 
 export const dynamic = "force-dynamic";
 
-async function requireAdminPage() {
-  const user = await getCurrentUser();
-  if (!user?.id) redirect("/admin/login");
-  if (user.role !== "admin") redirect("/dashboard");
+function CategoriesContent({ categories, isOffline }: { categories: any[]; isOffline: boolean }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Category Management</h1>
+          <p className="text-gray-600 mt-2">Organize and manage product categories (Rings, Necklaces, Earrings, etc.).</p>
+        </div>
+      </div>
+      {isOffline && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+          MongoDB is not reachable. Categories data is unavailable.
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+          <p className="text-gray-600 text-sm font-medium">Total Categories</p>
+          <p className="text-2xl font-bold text-gray-900 mt-2">{categories.length}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+          <p className="text-gray-600 text-sm font-medium">Active Categories</p>
+          <p className="text-2xl font-bold text-gray-900 mt-2">
+            {categories.filter(c => c.isActive).length}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
+          <p className="text-gray-600 text-sm font-medium">Inactive Categories</p>
+          <p className="text-2xl font-bold text-gray-900 mt-2">
+            {categories.filter(c => !c.isActive).length}
+          </p>
+        </div>
+      </div>
+      <CategoryManager initialCategories={categories} />
+    </div>
+  );
 }
 
 export default async function AdminCategoriesPage() {
@@ -18,48 +51,15 @@ export default async function AdminCategoriesPage() {
 
   try {
     await connectDB();
-    categories = await CategoryModel.find().populate("parent", "name").sort({ name: 1 }).lean();
+    const docs = await CategoryModel.find().populate("parent", "name").sort({ name: 1 }).lean();
+    categories = docs.map(serializeCategory);
   } catch {
     isOffline = true;
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F6F2] px-5 py-8 md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#9A7627]">Admin</p>
-          <h1 className="font-serif text-4xl font-semibold text-[#0A1628]">Category management</h1>
-          <p className="mt-2 text-slate-600">View jewellery categories used for rings, necklaces, bracelets, earrings, bangles, and collections.</p>
-        </div>
-        {isOffline && <div className="mb-5 rounded-lg border border-[#D8B35A]/50 bg-[#FFF8E6] px-4 py-3 text-sm text-[#6F5217]">MongoDB is not reachable.</div>}
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-              <tr>
-                <th className="px-5 py-3">Name</th>
-                <th className="px-5 py-3">Slug</th>
-                <th className="px-5 py-3">Parent</th>
-                <th className="px-5 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {categories.map((category) => (
-                <tr key={category._id.toString()}>
-                  <td className="px-5 py-4 font-semibold text-[#0A1628]">{category.name}</td>
-                  <td className="px-5 py-4 text-slate-600">{category.slug}</td>
-                  <td className="px-5 py-4 text-slate-600">{category.parent?.name || "Top level"}</td>
-                  <td className="px-5 py-4 text-slate-600">{category.isActive ? "Active" : "Inactive"}</td>
-                </tr>
-              ))}
-              {categories.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-slate-500">No categories found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <AdminLayout>
+      <CategoriesContent categories={categories} isOffline={isOffline} />
+    </AdminLayout>
   );
 }

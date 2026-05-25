@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { sendMail } from "@/lib/email";
+import { connectDB } from "@/lib/mongodb";
+import ContactMessageModel from "@/models/ContactMessage";
 
 const contactSchema = z.object({
   name: z.string().min(2),
@@ -25,6 +27,9 @@ export async function POST(request: Request) {
   }
 
   const { name, email, message } = parsed.data;
+  await connectDB();
+  await ContactMessageModel.create({ name, email, message, status: "new" });
+
   const safeName = escapeHtml(name);
   const safeEmail = escapeHtml(email);
   const safeMessage = escapeHtml(message).replaceAll("\n", "<br />");
@@ -36,11 +41,15 @@ export async function POST(request: Request) {
     <p>${safeMessage}</p>
   `;
 
-  await sendMail({
-    to: process.env.SMTP_USER ?? email,
-    subject: `Contact request from ${name}`,
-    html,
-  });
+  try {
+    await sendMail({
+      to: process.env.SMTP_USER ?? email,
+      subject: `Contact request from ${name}`,
+      html,
+    });
+  } catch {
+    return NextResponse.json({ message: "Your message was saved. Our team will reply soon." }, { status: 200 });
+  }
 
   return NextResponse.json({ message: "Your message was sent successfully." }, { status: 200 });
 }

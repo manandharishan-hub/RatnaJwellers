@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const statuses = ["pending", "processing", "shipped", "delivered", "cancelled", "refunded"];
+const statuses = ["pending", "processing", "packed", "out-for-delivery", "delivered", "cancelled", "refunded"];
 
 interface OrderStatusFormProps {
   orderId: string;

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import mongoose, { Document, Model } from "mongoose";
 
 export interface Address {
+  _id?: mongoose.Types.ObjectId;
   label: string;
   street: string;
   city: string;
@@ -9,6 +10,12 @@ export interface Address {
   zip: string;
   country: string;
   isDefault: boolean;
+}
+
+export interface UserCartItem {
+  product: mongoose.Types.ObjectId;
+  quantity: number;
+  variant?: string;
 }
 
 export interface UserDoc extends Document {
@@ -21,6 +28,7 @@ export interface UserDoc extends Document {
   isBlocked: boolean;
   addresses: Address[];
   wishlist: mongoose.Types.ObjectId[];
+  cart: UserCartItem[];
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -32,6 +40,12 @@ const addressSchema = new mongoose.Schema<Address>({
   zip: { type: String, required: true, trim: true },
   country: { type: String, required: true, trim: true },
   isDefault: { type: Boolean, default: false },
+});
+
+const cartItemSchema = new mongoose.Schema<UserCartItem>({
+  product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+  quantity: { type: Number, required: true, min: 1, default: 1 },
+  variant: { type: String, trim: true, default: "" },
 });
 
 const userSchema = new mongoose.Schema<UserDoc>(
@@ -48,11 +62,10 @@ const userSchema = new mongoose.Schema<UserDoc>(
     isBlocked: { type: Boolean, default: false },
     addresses: { type: [addressSchema], default: [] },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    cart: { type: [cartItemSchema], default: [] },
   },
   { timestamps: true }
 );
-
-userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;

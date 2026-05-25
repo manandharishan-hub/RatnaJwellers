@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import ProductModel from "@/models/Product";
+import { validateCouponCode } from "@/lib/coupons";
 
 export const STANDARD_SHIPPING_CENTS = 500;
 export const TAX_RATE = 0.08;
@@ -11,7 +12,7 @@ export type IncomingOrderItem = {
   variant?: string;
 };
 
-export async function priceOrderItems(items: IncomingOrderItem[]) {
+export async function priceOrderItems(items: IncomingOrderItem[], couponCode = "") {
   const normalizedItems = items.map((item) => ({
     productId: item.product ?? item.productId ?? "",
     quantity: Number(item.quantity ?? 0),
@@ -51,6 +52,7 @@ export async function priceOrderItems(items: IncomingOrderItem[]) {
       product: product._id,
       name: product.name,
       image: primaryImage,
+      imageUrl: primaryImage,
       price: product.price,
       quantity: item.quantity,
       variant: item.variant || variant?.size || "",
@@ -60,10 +62,11 @@ export async function priceOrderItems(items: IncomingOrderItem[]) {
   const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = Math.round(subtotal * TAX_RATE);
   const shippingCost = STANDARD_SHIPPING_CENTS;
-  const discount = 0;
+  const coupon = couponCode ? await validateCouponCode(couponCode, subtotal) : null;
+  const discount = coupon?.discount ?? 0;
   const total = subtotal + tax + shippingCost - discount;
 
-  return { orderItems, subtotal, tax, shippingCost, discount, total };
+  return { orderItems, subtotal, tax, shippingCost, discount, total, coupon };
 }
 
 export async function decreaseStockForOrder(orderItems: Awaited<ReturnType<typeof priceOrderItems>>["orderItems"]) {

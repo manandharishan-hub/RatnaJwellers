@@ -23,7 +23,7 @@ test("order status update API requires admin authentication", async ({ request }
   expect(response.status()).toBe(401);
 });
 
-test("order creation validates cart payload before database work", async ({ request }) => {
+test("order creation requires authentication", async ({ request }) => {
   const response = await request.post("/api/orders", {
     data: {
       shippingAddress: {
@@ -50,14 +50,22 @@ test("order creation validates cart payload before database work", async ({ requ
       items: [],
     },
   });
-  expect(response.status()).toBe(400);
+  expect(response.status()).toBe(401);
   const body = await response.json();
   expect(body).toEqual(expect.objectContaining({ message: expect.any(String) }));
 });
 
-test("payment intent API validates minimum amount", async ({ request }) => {
-  const response = await request.post("/api/payments/create-intent", {
-    data: { amount: 99 },
+test("account cart and wishlist APIs require authentication", async ({ request }) => {
+  const cartResponse = await request.get("/api/account/cart");
+  expect(cartResponse.status()).toBe(401);
+
+  const wishlistResponse = await request.get("/api/account/wishlist");
+  expect(wishlistResponse.status()).toBe(401);
+});
+
+test("eSewa initiation is public but validates checkout data", async ({ request }) => {
+  const response = await request.post("/api/payments/esewa/initiate", {
+    data: { items: [] },
   });
   expect(response.status()).toBe(400);
 });

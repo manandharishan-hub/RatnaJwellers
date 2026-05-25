@@ -60,6 +60,12 @@ export const wishlistMutationSchema = z.object({
   productId: z.string().min(1, "Product id is required"),
 });
 
+export const cartMutationSchema = z.object({
+  productId: z.string().min(1, "Product id is required"),
+  quantity: z.coerce.number().int().min(1, "Quantity must be at least 1").default(1),
+  variant: z.string().optional().default(""),
+});
+
 export const categorySchema = z.object({
   name: z.string().min(2, "Category name is required"),
   slug: z.string().min(2, "Slug is required").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and hyphens only"),
@@ -88,7 +94,7 @@ export const productSchema = z.object({
   sku: z.string().min(2, "SKU is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   careInstructions: z.string().optional().default("Handle with care and store in dry place."),
-  price: z.coerce.number().int().min(1, "Price must be greater than 0"),
+  price: z.coerce.number().int().min(100, "Price must be at least NPR 1"),
   comparePrice: z.coerce.number().int().min(0).default(0),
   costPrice: z.coerce.number().int().min(0).default(0),
   images: z.array(productImageSchema).min(1, "Add at least one product image"),
@@ -111,7 +117,7 @@ export const productSchema = z.object({
 });
 
 export const orderStatusSchema = z.object({
-  status: z.enum(["pending", "processing", "shipped", "delivered", "cancelled", "refunded"]),
+  status: z.enum(["pending", "processing", "packed", "out-for-delivery", "shipped", "delivered", "cancelled", "refunded"]),
   trackingNumber: z.string().optional(),
   note: z.string().optional(),
 });
@@ -134,10 +140,9 @@ export const orderCreateSchema = z.object({
   shippingAddress: orderAddressSchema,
   billingAddress: orderAddressSchema,
   items: z.array(orderItemSchema).min(1, "Cart items are required to create an order."),
-  paymentMethod: z.enum(["debit_card", "esewa", "Stripe", "stripe"]).default("debit_card"),
-  paymentStatus: z.enum(["pending", "paid", "failed"]).default("pending"),
-  stripePaymentId: z.string().optional().default(""),
+  paymentMethod: z.literal("esewa").default("esewa"),
+  paymentStatus: z.enum(["pending", "paid", "completed", "failed"]).default("pending"),
   transactionId: z.string().optional().default(""),
-  cardLast4: z.union([z.string().regex(/^\d{4}$/, "Card last four digits are required."), z.literal("")]).optional().default(""),
-  status: z.enum(["pending", "processing", "shipped", "delivered", "cancelled", "refunded"]).default("pending"),
+  status: z.enum(["pending", "processing", "packed", "out-for-delivery", "shipped", "delivered", "cancelled", "refunded"]).default("pending"),
+  couponCode: z.string().optional().default(""),
 });

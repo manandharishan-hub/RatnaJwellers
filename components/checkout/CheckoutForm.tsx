@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { ShieldCheck, WalletCards } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { checkoutSchema } from "@/lib/validation";
 import { useCartStore } from "@/hooks/store/cartStore";
 import { Button } from "@/components/ui/button";
@@ -11,17 +14,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { centsToCurrency } from "@/lib/utils";
 
-type CheckoutValues = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  street: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-};
+const checkoutFormSchema = checkoutSchema.extend({
+  billingFirstName: z.string().optional(),
+  billingLastName: z.string().optional(),
+  billingPhone: z.string().optional(),
+  billingStreet: z.string().optional(),
+  billingCity: z.string().optional(),
+  billingState: z.string().optional(),
+  billingZip: z.string().optional(),
+  billingCountry: z.string().optional(),
+});
+
+type CheckoutValues = z.infer<typeof checkoutFormSchema>;
 
 type EsewaInitiateResponse = {
   action: string;
@@ -47,11 +51,14 @@ function submitEsewaForm(action: string, fields: Record<string, string>) {
 }
 
 export default function CheckoutForm() {
+  const { status: authStatus } = useSession();
   const cartItems = useCartStore((state) => state.items);
+  const appliedCoupon = useCartStore((state) => state.coupon);
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingCost = 500;
   const tax = Math.round(subtotal * 0.08);
-  const total = subtotal + shippingCost + tax;
+  const discount = Math.min(appliedCoupon?.discount ?? 0, subtotal);
+  const total = subtotal > 0 ? subtotal + shippingCost + tax - discount : 0;
   const [useShippingAsBilling, setUseShippingAsBilling] = useState(true);
   const [status, setStatus] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -59,7 +66,31 @@ export default function CheckoutForm() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<CheckoutValues>({ resolver: zodResolver(checkoutSchema) });
+  } = useForm<CheckoutValues>({ resolver: zodResolver(checkoutFormSchema) });
+
+  function getBillingAddress(values: CheckoutValues) {
+    if (useShippingAsBilling) {
+      return { ...values };
+    }
+
+    const billingAddress = {
+      firstName: values.billingFirstName?.trim() ?? "",
+      lastName: values.billingLastName?.trim() ?? "",
+      phone: values.billingPhone?.trim() ?? "",
+      street: values.billingStreet?.trim() ?? "",
+      city: values.billingCity?.trim() ?? "",
+      state: values.billingState?.trim() ?? "",
+      zip: values.billingZip?.trim() ?? "",
+      country: values.billingCountry?.trim() ?? "",
+    };
+
+    if (Object.values(billingAddress).some((value) => !value)) {
+      setErrorMessage("Enter complete billing details or use the shipping address as billing.");
+      return null;
+    }
+
+    return billingAddress;
+  }
 
   async function onSubmit(values: CheckoutValues) {
     setErrorMessage("");
@@ -71,15 +102,19 @@ export default function CheckoutForm() {
     }
 
     setStatus("Preparing secure eSewa payment...");
+    const billingAddress = getBillingAddress(values);
+    if (!billingAddress) return;
+
     const checkoutPayload = {
       shippingAddress: { ...values },
-      billingAddress: { ...values },
+      billingAddress,
       items: cartItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
         variant: item.variant,
       })),
       paymentMethod: "esewa",
+      couponCode: appliedCoupon?.code ?? "",
     };
 
     const esewaResponse = await fetch("/api/payments/esewa/initiate", {
@@ -103,6 +138,20 @@ export default function CheckoutForm() {
 
   return (
     <div className="space-y-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+      <section className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700 md:grid-cols-3">
+        <div className={authStatus === "unauthenticated" ? "rounded-lg border border-[#D8B35A] bg-white p-4" : "rounded-lg border border-slate-200 bg-white p-4"}>
+          <p className="font-semibold text-[#0A1628]">Guest checkout</p>
+          <p className="mt-1">Continue with email and shipping details.</p>
+        </div>
+        <Link href="/login?callbackUrl=/checkout" className="rounded-lg border border-slate-200 bg-white p-4 transition hover:border-[#D8B35A]">
+          <p className="font-semibold text-[#0A1628]">Login</p>
+          <p className="mt-1">Use saved account details.</p>
+        </Link>
+        <Link href="/register?callbackUrl=/checkout" className="rounded-lg border border-slate-200 bg-white p-4 transition hover:border-[#D8B35A]">
+          <p className="font-semibold text-[#0A1628]">Register</p>
+          <p className="mt-1">Create an account before payment.</p>
+        </Link>
+      </section>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-7">
         <section className="space-y-5">
           <div>
@@ -180,8 +229,39 @@ export default function CheckoutForm() {
             Billing address same as shipping
           </label>
           {!useShippingAsBilling && (
-            <div className="rounded-lg border border-[#D8B35A]/50 bg-white px-4 py-3 text-sm text-slate-600">
-              Billing details will use the shipping address for this eSewa checkout.
+            <div className="grid gap-4 rounded-lg border border-[#D8B35A]/50 bg-white p-4 md:grid-cols-2">
+              <div>
+                <Label htmlFor="billingFirstName">Billing first name</Label>
+                <Input id="billingFirstName" {...register("billingFirstName")} />
+              </div>
+              <div>
+                <Label htmlFor="billingLastName">Billing last name</Label>
+                <Input id="billingLastName" {...register("billingLastName")} />
+              </div>
+              <div>
+                <Label htmlFor="billingPhone">Billing phone</Label>
+                <Input id="billingPhone" type="tel" {...register("billingPhone")} />
+              </div>
+              <div>
+                <Label htmlFor="billingStreet">Billing street address</Label>
+                <Input id="billingStreet" {...register("billingStreet")} />
+              </div>
+              <div>
+                <Label htmlFor="billingCity">Billing city</Label>
+                <Input id="billingCity" {...register("billingCity")} />
+              </div>
+              <div>
+                <Label htmlFor="billingState">Billing state</Label>
+                <Input id="billingState" {...register("billingState")} />
+              </div>
+              <div>
+                <Label htmlFor="billingZip">Billing ZIP</Label>
+                <Input id="billingZip" {...register("billingZip")} />
+              </div>
+              <div>
+                <Label htmlFor="billingCountry">Billing country</Label>
+                <Input id="billingCountry" {...register("billingCountry")} />
+              </div>
             </div>
           )}
         </section>
@@ -190,6 +270,7 @@ export default function CheckoutForm() {
           <div className="flex justify-between">Subtotal<span>{centsToCurrency(subtotal)}</span></div>
           <div className="flex justify-between">Shipping<span>{centsToCurrency(shippingCost)}</span></div>
           <div className="flex justify-between">Tax<span>{centsToCurrency(tax)}</span></div>
+          {discount > 0 && <div className="flex justify-between text-emerald-700">Coupon ({appliedCoupon?.code})<span>-{centsToCurrency(discount)}</span></div>}
           <div className="flex justify-between border-t border-slate-200 pt-3 font-semibold text-[#0A1628]">Total<span>{centsToCurrency(total)}</span></div>
         </section>
 

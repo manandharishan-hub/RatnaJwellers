@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       isBlocked: false,
       addresses: [],
       wishlist: [],
+      cart: [],
     });
 
     if (emailVerificationRequired) {

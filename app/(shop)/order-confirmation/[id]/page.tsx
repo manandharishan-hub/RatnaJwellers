@@ -1,8 +1,13 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Package, ShoppingBag } from "lucide-react";
 import { connectDB } from "@/lib/mongodb";
+import { getCurrentUser } from "@/lib/serverAuth";
+import { centsToCurrency } from "@/lib/utils";
 import OrderModel from "@/models/Order";
 
 interface OrderPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function getOrder(id: string) {
@@ -11,14 +16,15 @@ async function getOrder(id: string) {
 }
 
 export default async function OrderConfirmationPage({ params }: OrderPageProps) {
-  const order = await getOrder(params.id);
+  const user = await getCurrentUser();
+
+  const { id } = await params;
+  const order = await getOrder(id);
   if (!order) {
-    return (
-      <div className="px-6 py-24 text-center">
-        <h1 className="text-3xl font-semibold text-[#0A1628]">Order not found</h1>
-        <p className="mt-3 text-slate-600">Please contact customer support if you need help with your purchase.</p>
-      </div>
-    );
+    notFound();
+  }
+  if (order.user && order.user.toString() !== user?.id) {
+    notFound();
   }
 
   return (
@@ -33,18 +39,28 @@ export default async function OrderConfirmationPage({ params }: OrderPageProps) 
           <div className="flex justify-between"><span>Order status</span><strong>{order.status}</strong></div>
           <div className="flex justify-between"><span>Payment</span><strong>{order.paymentStatus}</strong></div>
           <div className="flex justify-between"><span>Shipping method</span><strong>{order.shippingMethod}</strong></div>
-          <div className="flex justify-between"><span>Total</span><strong>${(order.total / 100).toFixed(2)}</strong></div>
+          <div className="flex justify-between"><span>Total</span><strong>{centsToCurrency(order.total)}</strong></div>
         </div>
         <div className="space-y-4">
-          {order.items.map((item) => (
-            <div key={item.product.toString()} className="flex items-center justify-between gap-4 rounded-3xl border border-slate-200 bg-white p-4">
+          {order.items.map((item, index) => (
+            <div key={`${item.product.toString()}-${item.variant ?? "standard"}-${index}`} className="flex items-center justify-between gap-4 rounded-3xl border border-slate-200 bg-white p-4">
               <div>
                 <p className="font-semibold text-[#0A1628]">{item.name}</p>
-                <p className="text-sm text-slate-600">Quantity: {item.quantity}</p>
+                <p className="text-sm text-slate-600">Quantity: {item.quantity}{item.variant ? ` · ${item.variant}` : ""}</p>
               </div>
-              <p className="font-semibold text-[#0A1628]">${(item.price / 100).toFixed(2)}</p>
+              <p className="font-semibold text-[#0A1628]">{centsToCurrency(item.price)}</p>
             </div>
           ))}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link href="/account/orders" className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-[#0A1628] transition hover:border-[#D8B35A]">
+            <Package size={16} />
+            Track order
+          </Link>
+          <Link href="/shop" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0A1628] px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-900">
+            <ShoppingBag size={16} />
+            Continue shopping
+          </Link>
         </div>
       </div>
     </div>

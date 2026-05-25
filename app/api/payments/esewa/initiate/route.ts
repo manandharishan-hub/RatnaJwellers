@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { jsonError, firstZodMessage } from "@/lib/apiErrors";
-import { centsToEsewaAmount, createEsewaTransactionUuid, ESEWA_SIGNED_FIELD_NAMES, generateEsewaSignature, getEsewaConfig } from "@/lib/esewa";
+import { centsToEsewaAmount, createEsewaTransactionUuid, ESEWA_MIN_TOTAL_CENTS, ESEWA_SIGNED_FIELD_NAMES, generateEsewaSignature, getEsewaConfig } from "@/lib/esewa";
+import { centsToCurrency } from "@/lib/utils";
 import { connectDB } from "@/lib/mongodb";
 import { priceOrderItems } from "@/lib/orderPricing";
 import { orderCreateSchema } from "@/lib/validation";
@@ -25,15 +26,19 @@ export async function POST(request: Request) {
   await connectDB();
   let pricedOrder;
   try {
-    pricedOrder = await priceOrderItems(parsed.data.items);
+    pricedOrder = await priceOrderItems(parsed.data.items, parsed.data.couponCode);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to price order.";
     return jsonError(message, 400);
   }
 
+  if (pricedOrder.total < ESEWA_MIN_TOTAL_CENTS) {
+    return jsonError(`eSewa payment total must be at least ${centsToCurrency(ESEWA_MIN_TOTAL_CENTS)}. Please update the product price or add more items.`, 400);
+  }
+
   const config = getEsewaConfig();
   const baseUrl = getBaseUrl(request);
-  const amount = centsToEsewaAmount(pricedOrder.subtotal);
+  const amount = centsToEsewaAmount(pricedOrder.subtotal - pricedOrder.discount);
   const taxAmount = centsToEsewaAmount(pricedOrder.tax);
   const deliveryCharge = centsToEsewaAmount(pricedOrder.shippingCost);
   const serviceCharge = centsToEsewaAmount(0);

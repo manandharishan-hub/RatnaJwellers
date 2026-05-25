@@ -5,9 +5,9 @@ export function buildOrderNumber() {
 }
 
 export function centsToCurrency(cents: number) {
-  return (cents / 100).toLocaleString("en-US", {
+  return (cents / 100).toLocaleString("en-NP", {
     style: "currency",
-    currency: "USD",
+    currency: "NPR",
   });
 }
 

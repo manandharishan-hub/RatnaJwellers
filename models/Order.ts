@@ -4,6 +4,7 @@ export interface OrderItem {
   product: mongoose.Types.ObjectId;
   name: string;
   image: string;
+  imageUrl?: string;
   price: number;
   quantity: number;
   variant?: string;
@@ -35,15 +36,14 @@ export interface OrderDoc extends Document {
   billingAddress: OrderAddress;
   paymentMethod: string;
   paymentStatus: string;
-  stripePaymentId: string;
   transactionId: string;
-  cardLast4: string;
   shippingMethod: string;
   shippingCost: number;
   subtotal: number;
   tax: number;
   discount: number;
   total: number;
+  totalAmount?: number;
   couponCode?: string;
   status: string;
   trackingNumber?: string;
@@ -55,6 +55,7 @@ const itemSchema = new mongoose.Schema<OrderItem>({
   product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
   name: { type: String, required: true },
   image: { type: String, required: true },
+  imageUrl: { type: String, default: "" },
   price: { type: Number, required: true },
   quantity: { type: Number, required: true },
   variant: { type: String, default: "" },
@@ -85,21 +86,20 @@ const orderSchema = new mongoose.Schema<OrderDoc>(
     items: { type: [itemSchema], required: true },
     shippingAddress: { type: addressSchema, required: true },
     billingAddress: { type: addressSchema, required: true },
-    paymentMethod: { type: String, required: true, default: "debit_card" },
-    paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
-    stripePaymentId: { type: String, default: "" },
+    paymentMethod: { type: String, required: true, enum: ["esewa"], default: "esewa" },
+    paymentStatus: { type: String, enum: ["pending", "paid", "completed", "failed"], default: "pending" },
     transactionId: { type: String, default: "" },
-    cardLast4: { type: String, default: "" },
     shippingMethod: { type: String, default: "Standard" },
     shippingCost: { type: Number, default: 0 },
     subtotal: { type: Number, required: true },
     tax: { type: Number, required: true },
     discount: { type: Number, required: true },
     total: { type: Number, required: true },
+    totalAmount: { type: Number, default: 0 },
     couponCode: { type: String, default: "" },
     status: {
       type: String,
-      enum: ["pending", "processing", "shipped", "delivered", "cancelled", "refunded"],
+      enum: ["pending", "processing", "packed", "out-for-delivery", "shipped", "delivered", "cancelled", "refunded"],
       default: "pending",
     },
     trackingNumber: { type: String, default: "" },
@@ -110,7 +110,6 @@ const orderSchema = new mongoose.Schema<OrderDoc>(
 );
 
 orderSchema.index({ user: 1 });
-orderSchema.index({ orderNumber: 1 }, { unique: true });
 
 const OrderModel = (mongoose.models.Order as Model<OrderDoc>) || mongoose.model<OrderDoc>("Order", orderSchema, "orders");
 export default OrderModel;

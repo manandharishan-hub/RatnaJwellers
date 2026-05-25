@@ -69,12 +69,12 @@ export default function ResetPasswordClient({ token, email }: ResetPasswordClien
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
         <div>
           <Label htmlFor="password">New password</Label>
-          <Input id="password" type="password" placeholder="New password" {...register("password")} />
+          <Input id="password" type="password" autoComplete="new-password" placeholder="New password" {...register("password")} />
           {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
         </div>
         <div>
           <Label htmlFor="confirmPassword">Confirm password</Label>
-          <Input id="confirmPassword" type="password" {...register("confirmPassword")} placeholder="Confirm password" />
+          <Input id="confirmPassword" type="password" autoComplete="new-password" {...register("confirmPassword")} placeholder="Confirm password" />
           {errors.confirmPassword && <p className="mt-2 text-sm text-red-600">{errors.confirmPassword.message}</p>}
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}

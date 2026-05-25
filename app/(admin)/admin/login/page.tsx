@@ -10,7 +10,6 @@ import { loginSchema } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
 
 type LoginValues = {
   email: string;
@@ -25,7 +24,6 @@ function getLoginErrorMessage(error?: string | null) {
 
 export default function AdminLoginPage() {
   const [error, setError] = useState("");
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -51,8 +49,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push(result?.url ?? "/admin/dashboard");
-    router.refresh();
+    window.location.assign("/admin/dashboard");
   }
 
   return (
@@ -69,12 +66,12 @@ export default function AdminLoginPage() {
         <form method="post" onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
           <div>
             <Label htmlFor="email">Admin email</Label>
-            <Input id="email" type="email" placeholder="admin123@gmail.com" {...register("email")} />
+            <Input id="email" type="email" autoComplete="username" placeholder="admin123@gmail.com" {...register("email")} />
             {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
           </div>
           <div>
             <Label htmlFor="password">Admin password</Label>
-            <Input id="password" type="password" placeholder="admin123" {...register("password")} />
+            <Input id="password" type="password" autoComplete="current-password" placeholder="admin123" {...register("password")} />
             {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}

@@ -18,7 +18,7 @@ Ratna is a Next.js e-commerce web application that allows users to browse produc
 
 \- Tailwind CSS
 
-\- Stripe
+\- eSewa
 
 \- Firebase
 
@@ -74,11 +74,11 @@ Ratna is a Next.js e-commerce web application that allows users to browse produc
 
 \## Payment Requirements
 
-\- Stripe payment integration
+\- eSewa payment integration
 
-\- Checkout session creation
+\- eSewa checkout initiation
 
-\- Payment success and cancel pages
+\- Payment success and failure pages
 
 
 

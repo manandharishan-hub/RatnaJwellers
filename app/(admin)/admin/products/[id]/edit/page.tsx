@@ -57,7 +57,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     <div className="px-6 py-10 md:px-10 lg:px-16">
       <div className="mb-8">
         <h1 className="text-3xl font-semibold text-[#0A1628]">Edit product</h1>
-        <p className="mt-2 text-slate-600">Update catalog details, images, pricing, and inventory.</p>
+        <p className="mt-2 text-slate-600">Update product details, photos, price, and stock.</p>
       </div>
       <ProductForm mode="edit" product={product} categories={categories} />
     </div>

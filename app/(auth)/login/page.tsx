@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Gem, ShieldCheck, UserRound } from "lucide-react";
@@ -10,7 +11,6 @@ import { loginSchema } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
 
 type LoginValues = {
   email: string;
@@ -31,13 +31,22 @@ function getSafeCallbackUrl() {
 }
 
 export default function LoginPage() {
-  const [error, setError] = useState("");
   const router = useRouter();
+  const { data: session, status } = useSession();
+  const [error, setError] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    const role = (session?.user as { role?: string } | undefined)?.role;
+    if (role !== "admin") {
+      router.replace("/dashboard");
+    }
+  }, [router, session?.user, status]);
 
   async function onSubmit(values: LoginValues) {
     setError("");
@@ -58,8 +67,8 @@ export default function LoginPage() {
       return;
     }
 
-    router.push(result?.url ?? "/dashboard");
-    router.refresh();
+    const destination = result.url ?? callbackUrl;
+    window.location.assign(destination);
   }
 
   return (
@@ -91,12 +100,12 @@ export default function LoginPage() {
             <form method="post" onSubmit={handleSubmit(onSubmit)} className="mt-6 grid gap-5">
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="yourname@gmail.com" {...register("email")} />
+                <Input id="email" type="email" autoComplete="username" placeholder="yourname@gmail.com" {...register("email")} />
                 {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="Your password" {...register("password")} />
+                <Input id="password" type="password" autoComplete="current-password" placeholder="Your password" {...register("password")} />
                 {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
               </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
