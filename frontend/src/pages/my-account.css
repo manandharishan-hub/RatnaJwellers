@@ -1,0 +1,448 @@
+.account-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.account-hero {
+  margin-bottom: 24px;
+}
+
+.account-eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #8a6342;
+  font-weight: 700;
+}
+
+.account-hero h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.05;
+  color: #3d2b1a;
+}
+
+.account-hero p {
+  margin: 10px 0 0;
+  max-width: 760px;
+  color: #6b4f35;
+  font-size: 16px;
+}
+
+.account-container {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+/* ── Sidebar ── */
+.account-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #fff8f0;
+  border: 1.5px solid #e2cdb8;
+  border-radius: 14px;
+  padding: 24px 16px;
+  position: sticky;
+  top: 24px;
+}
+
+.account-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.avatar-circle {
+  width: 64px;
+  height: 64px;
+  background: #c9a07a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.account-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #3d2b1a;
+}
+
+.account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account-nav-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #5a3b1e;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.account-nav-item:hover {
+  background: #f5ede3;
+}
+
+.account-nav-item.active {
+  background: #c9a07a;
+  color: #fff;
+  font-weight: 600;
+}
+
+.account-nav-item.logout {
+  color: #b91c1c;
+  margin-top: 4px;
+}
+
+.account-nav-item.logout:hover {
+  background: #fee2e2;
+}
+
+.account-nav-divider {
+  border: none;
+  border-top: 1px solid #e2cdb8;
+  margin: 8px 0;
+}
+
+/* ── Content area ── */
+.account-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-section {
+  background: #fff8f0;
+  border: 1.5px solid #e2cdb8;
+  border-radius: 14px;
+  padding: 28px 32px;
+}
+
+.account-section h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3d2b1a;
+  margin: 0 0 24px 0;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid #e2cdb8;
+}
+
+/* ── Forms ── */
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 480px;
+}
+
+.account-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.account-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b4f35;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.account-form-group input {
+  padding: 11px 14px;
+  border: 1.5px solid #d4b896;
+  border-radius: 8px;
+  font-size: 14.5px;
+  color: #2d1f16;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.account-form-group input:focus {
+  outline: none;
+  border-color: #c9a07a;
+  box-shadow: 0 0 0 3px rgba(201, 160, 122, 0.18);
+}
+
+.account-btn {
+  padding: 11px 28px;
+  background: #5a3b1e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+
+.account-btn:hover:not(:disabled) {
+  background: #3d2714;
+}
+
+.account-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.account-btn-outline {
+  padding: 10px 22px;
+  background: transparent;
+  color: #b91c1c;
+  border: 1.5px solid #b91c1c;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.account-btn-outline:hover {
+  background: #fee2e2;
+}
+
+.account-error {
+  color: #b91c1c;
+  font-size: 14px;
+  margin: 0;
+}
+
+.account-success {
+  color: #166534;
+  font-size: 14px;
+  margin: 0;
+}
+
+.account-hint {
+  color: #9d8873;
+  font-size: 14px;
+  margin: 0;
+}
+
+.account-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+/* ── Order cards ── */
+.order-card {
+  border: 1.5px solid #e2cdb8;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: #f5ede3;
+  border-bottom: 1px solid #e2cdb8;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.order-id {
+  font-weight: 700;
+  color: #3d2b1a;
+  font-size: 15px;
+  margin-right: 10px;
+}
+
+.order-date {
+  font-size: 13px;
+  color: #9d8873;
+}
+
+.order-status-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.order-status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.order-track-btn {
+  padding: 5px 14px;
+  background: #5a3b1e;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.order-track-btn:hover {
+  background: #3d2714;
+}
+
+.order-items-list {
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #3d2b1a;
+  gap: 8px;
+}
+
+.order-item-name {
+  flex: 1;
+}
+
+.order-item-qty {
+  color: #9d8873;
+}
+
+.order-item-price {
+  font-weight: 600;
+}
+
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  background: #fdf7f2;
+  border-top: 1px solid #e2cdb8;
+  font-size: 14px;
+  color: #3d2b1a;
+}
+
+.order-payment-status {
+  font-size: 12px;
+  color: #9d8873;
+  text-transform: uppercase;
+}
+
+/* ── Consultation cards ── */
+.consult-card {
+  border: 1.5px solid #e2cdb8;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.consult-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 18px;
+  background: #f5ede3;
+  border-bottom: 1px solid #e2cdb8;
+  gap: 12px;
+}
+
+.consult-card-header h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #3d2b1a;
+}
+
+.consult-meta {
+  margin: 3px 0;
+  font-size: 13.5px;
+  color: #6b4f35;
+}
+
+.consult-meta code {
+  background: #f0e6d8;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12.5px;
+}
+
+.consult-actions {
+  display: flex;
+  gap: 10px;
+  padding: 12px 18px;
+  flex-wrap: wrap;
+}
+
+.consult-notes {
+  padding: 12px 18px;
+  background: #fdf7f2;
+  border-top: 1px solid #e2cdb8;
+  font-size: 14px;
+  color: #3d2b1a;
+}
+
+.consult-notes strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #6b4f35;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .account-main {
+    padding: 24px 16px 36px;
+  }
+
+  .account-hero h1 {
+    font-size: 32px;
+  }
+
+  .account-container {
+    flex-direction: column;
+  }
+
+  .account-sidebar {
+    width: 100%;
+    position: static;
+  }
+
+  .account-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .account-nav-item {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .account-section {
+    padding: 20px 16px;
+  }
+}
