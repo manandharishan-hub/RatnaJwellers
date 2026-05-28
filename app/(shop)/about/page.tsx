@@ -5,7 +5,7 @@ export default function AboutPage() {
         <p className="text-sm uppercase tracking-[0.28em] text-[#C9A84C]">About us</p>
         <h1 className="text-4xl font-semibold text-[#0A1628]">A legacy of elegance, crafted for modern celebrations.</h1>
         <p className="text-lg leading-8 text-slate-600">
-          Ratna Jewels blends artisanal craftsmanship with premium gemstones and exceptional service. Each collection is designed for bridal moments, anniversary gifts, and everyday indulgence.
+          Ratna Jewels blends artisanal craftsmanship with premium gemstones and exceptional service. Each gallery piece is designed for bridal moments, anniversary gifts, and everyday indulgence.
         </p>
       </div>
       <div className="grid gap-8 lg:grid-cols-2">

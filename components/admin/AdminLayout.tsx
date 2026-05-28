@@ -26,6 +26,7 @@ import {
   Search,
   ChevronDown,
   ChevronRight,
+  Images,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -218,6 +219,11 @@ const menuItems: MenuItemConfig[] = [
     icon: <Grid3x3 className="w-5 h-5" />,
   },
   {
+    href: "/admin/gallery",
+    label: "Gallery Management",
+    icon: <Images className="w-5 h-5" />,
+  },
+  {
     href: "/admin/staff",
     label: "Staff / Roles Management",
     icon: <Users className="w-5 h-5" />,
@@ -323,31 +329,44 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={`${
-          sidebarOpen ? "w-64" : "w-20"
-        } flex h-screen flex-col bg-slate-900 text-white transition-all duration-300`}
+          sidebarOpen ? "w-72" : "w-[88px]"
+        } flex h-screen shrink-0 flex-col border-r border-white/10 bg-[#071123] text-white shadow-2xl shadow-slate-950/20 transition-all duration-300`}
       >
         {/* Logo */}
-        <div className="p-4 border-b border-slate-700">
+        <div className="border-b border-white/10 p-4">
           <Link
             href="/admin/dashboard"
-            className="flex items-center gap-2 font-bold text-lg hover:text-blue-400"
+            className={`flex items-center gap-3 rounded-2xl px-2 py-2 font-bold text-lg transition hover:bg-white/5 ${
+              sidebarOpen ? "justify-start" : "justify-center"
+            }`}
           >
             {sidebarOpen ? (
               <>
-                <Image src="/logo.png" alt="" width={36} height={36} className="h-7 w-7 object-contain" />
-                <span>RATNA Admin</span>
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5">
+                  <Image src="/logo.png" alt="" width={36} height={36} className="h-8 w-8 object-contain" />
+                </span>
+                <span className="leading-tight">
+                  RATNA
+                  <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Admin</span>
+                </span>
               </>
             ) : (
-              <Image src="/logo.png" alt="RATNA Admin" width={36} height={36} className="h-7 w-7 object-contain" />
+              <Image src="/logo.png" alt="RATNA Admin" width={40} height={40} className="h-10 w-10 object-contain" />
             )}
           </Link>
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {menuItems.map((item) => {
             const isActive = isMenuActive(item);
             const isExpanded = expandedMenus.includes(item.label);
+            const itemBaseClass = `group relative flex w-full items-center rounded-2xl transition-all ${
+              sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-0 py-3"
+            }`;
+            const itemStateClass = isActive
+              ? "bg-blue-600 text-white shadow-lg shadow-blue-950/25"
+              : "text-slate-300 hover:bg-white/8 hover:text-white";
 
             return (
               <div key={item.label}>
@@ -355,16 +374,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   <>
                     <button
                       onClick={() => toggleMenu(item.label)}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                        isActive
-                          ? "bg-blue-600 text-white"
-                          : "hover:bg-slate-800 text-slate-300"
-                      }`}
+                      title={!sidebarOpen ? item.label : undefined}
+                      className={`${itemBaseClass} ${itemStateClass}`}
                     >
-                      {item.icon}
+                      <span className={sidebarOpen ? "shrink-0" : "flex h-7 w-7 items-center justify-center"}>
+                        {item.icon}
+                      </span>
                       {sidebarOpen && (
                         <>
-                          <span className="flex-1 text-left text-sm">
+                          <span className="flex-1 text-left text-sm font-medium">
                             {item.label}
                           </span>
                           <ChevronRight
@@ -374,17 +392,22 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                           />
                         </>
                       )}
+                      {!sidebarOpen && (
+                        <span className="pointer-events-none absolute left-[76px] z-40 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-xl transition group-hover:opacity-100">
+                          {item.label}
+                        </span>
+                      )}
                     </button>
                     {sidebarOpen && isExpanded && (
-                      <div className="ml-4 mt-1 space-y-1 border-l border-slate-700 pl-2">
+                      <div className="ml-5 mt-1 space-y-1 border-l border-white/10 pl-3">
                         {item.submenu.map((sub) => (
                           <Link
                             key={sub.href}
                             href={sub.href || "#"}
-                            className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
+                            className={`block rounded-xl px-3 py-2 text-sm transition-colors ${
                               pathname === sub.href?.split("?")[0]
                                 ? "bg-blue-700 text-white"
-                                : "hover:bg-slate-800 text-slate-400"
+                                : "text-slate-400 hover:bg-white/8 hover:text-white"
                             }`}
                           >
                             {sub.label}
@@ -396,15 +419,19 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 ) : (
                   <Link
                     href={item.href || "#"}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? "bg-blue-600 text-white"
-                        : "hover:bg-slate-800 text-slate-300"
-                    }`}
+                    title={!sidebarOpen ? item.label : undefined}
+                    className={`${itemBaseClass} ${itemStateClass}`}
                   >
-                    {item.icon}
+                    <span className={sidebarOpen ? "shrink-0" : "flex h-7 w-7 items-center justify-center"}>
+                      {item.icon}
+                    </span>
                     {sidebarOpen && (
-                      <span className="text-sm">{item.label}</span>
+                      <span className="text-sm font-medium">{item.label}</span>
+                    )}
+                    {!sidebarOpen && (
+                      <span className="pointer-events-none absolute left-[76px] z-40 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-xl transition group-hover:opacity-100">
+                        {item.label}
+                      </span>
                     )}
                   </Link>
                 )}
@@ -414,13 +441,21 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Logout Button */}
-        <div className="p-4 border-t border-slate-700">
+        <div className="border-t border-white/10 p-3">
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-600 transition-colors text-slate-300"
+            title={!sidebarOpen ? "Logout" : undefined}
+            className={`group relative flex w-full items-center rounded-2xl text-slate-300 transition-colors hover:bg-red-600 hover:text-white ${
+              sidebarOpen ? "gap-3 px-3 py-3" : "justify-center px-0 py-3"
+            }`}
           >
             <LogOut className="w-5 h-5" />
-            {sidebarOpen && <span className="text-sm">Logout</span>}
+            {sidebarOpen && <span className="text-sm font-medium">Logout</span>}
+            {!sidebarOpen && (
+              <span className="pointer-events-none absolute left-[76px] z-40 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-xl transition group-hover:opacity-100">
+                Logout
+              </span>
+            )}
           </button>
         </div>
       </aside>

@@ -20,15 +20,19 @@ function escapeHtml(value: string) {
 }
 
 export async function POST(request: Request) {
-  const data = await request.json();
+  const data = await request.json().catch(() => null);
   const parsed = contactSchema.safeParse(data);
   if (!parsed.success) {
     return NextResponse.json({ message: parsed.error.issues?.[0]?.message ?? "Invalid input." }, { status: 400 });
   }
 
   const { name, email, message } = parsed.data;
-  await connectDB();
-  await ContactMessageModel.create({ name, email, message, status: "new" });
+  try {
+    await connectDB();
+    await ContactMessageModel.create({ name, email, message, status: "new" });
+  } catch {
+    return NextResponse.json({ message: "Unable to save your message right now. Please try again shortly." }, { status: 503 });
+  }
 
   const safeName = escapeHtml(name);
   const safeEmail = escapeHtml(email);

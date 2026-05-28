@@ -72,30 +72,30 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const selectedSort = resolvedSearchParams.sort ?? "newest";
 
   return (
-    <div className="px-6 py-10 md:px-10 lg:px-16">
-      <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="page-shell">
+      <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-[#C9A84C]">Luxury Jewelry</p>
-          <h1 className="mt-3 text-4xl font-semibold text-[#0A1628]">Shop elegant designer pieces</h1>
+          <p className="eyebrow">Luxury Jewelry</p>
+          <h1 className="mt-3 page-title">Shop elegant designer pieces</h1>
           {isDemo && <p className="mt-3 max-w-2xl text-sm text-slate-600">MongoDB is unavailable. Start MongoDB or update MONGODB_URI to render live products.</p>}
         </div>
-        <form className="flex w-full max-w-md items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm md:w-auto">
+        <form className="flex w-full max-w-md items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm md:w-auto">
           <input name="search" type="search" placeholder="Search jewelry, rings, necklaces..." defaultValue={resolvedSearchParams.search ?? ""} className="w-full bg-transparent text-sm text-slate-700 outline-none" />
-          <button type="submit" className="rounded-full bg-[#0A1628] px-4 py-2 text-sm font-semibold text-white">Search</button>
+          <button type="submit" className="lux-button-primary px-4 py-2">Search</button>
         </form>
       </div>
 
       <div className="grid gap-8 xl:grid-cols-[280px_1fr]">
-        <aside className="space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <aside className="surface-panel h-fit space-y-6">
           <h2 className="text-lg font-semibold text-[#0A1628]">Filters</h2>
           <div className="space-y-3 text-sm text-slate-600">
             <p className="font-medium text-slate-900">Categories</p>
             <div className="space-y-2">
-              <Link href="/shop" className="block rounded-lg border border-slate-200 px-4 py-3 transition hover:border-[#C9A84C] hover:bg-[#F7F1D1]">
+              <Link href="/shop" className="block rounded-lg border border-slate-200 px-4 py-3 transition hover:border-[#C9A84C] hover:bg-[#FBFAF7]">
                 All jewelry
               </Link>
               {categories.map((category) => (
-                <Link key={category._id.toString()} href={`/shop/${category.slug}`} className="block rounded-lg border border-slate-200 px-4 py-3 transition hover:border-[#C9A84C] hover:bg-[#F7F1D1]">
+                <Link key={category._id.toString()} href={`/shop/${category.slug}`} className="block rounded-lg border border-slate-200 px-4 py-3 transition hover:border-[#C9A84C] hover:bg-[#FBFAF7]">
                   {category.name}
                 </Link>
               ))}
@@ -106,7 +106,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             <input type="hidden" name="search" value={resolvedSearchParams.search ?? ""} />
             <div>
               <label htmlFor="category" className="font-medium text-slate-900">Category</label>
-              <select id="category" name="category" defaultValue={resolvedSearchParams.category ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2">
+              <select id="category" name="category" defaultValue={resolvedSearchParams.category ?? ""} className="mt-2 lux-input">
                 <option value="">Any category</option>
                 {categories.map((category) => (
                   <option key={category._id.toString()} value={category.slug}>{category.name}</option>
@@ -115,7 +115,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </div>
             <div>
               <label htmlFor="material" className="font-medium text-slate-900">Material</label>
-              <select id="material" name="material" defaultValue={resolvedSearchParams.material ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2">
+              <select id="material" name="material" defaultValue={resolvedSearchParams.material ?? ""} className="mt-2 lux-input">
                 <option value="">Any material</option>
                 <option value="Gold">Gold</option>
                 <option value="Silver">Silver</option>
@@ -124,7 +124,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </div>
             <div>
               <label htmlFor="gemstone" className="font-medium text-slate-900">Gemstone</label>
-              <select id="gemstone" name="gemstone" defaultValue={resolvedSearchParams.gemstone ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2">
+              <select id="gemstone" name="gemstone" defaultValue={resolvedSearchParams.gemstone ?? ""} className="mt-2 lux-input">
                 <option value="">Any gemstone</option>
                 <option value="Diamond">Diamond</option>
                 <option value="Ruby">Ruby</option>
@@ -135,7 +135,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </div>
             <div>
               <label htmlFor="occasion" className="font-medium text-slate-900">Occasion</label>
-              <select id="occasion" name="occasion" defaultValue={resolvedSearchParams.occasion ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2">
+              <select id="occasion" name="occasion" defaultValue={resolvedSearchParams.occasion ?? ""} className="mt-2 lux-input">
                 <option value="">Any occasion</option>
                 <option value="Everyday">Everyday</option>
                 <option value="Bridal">Bridal</option>
@@ -145,41 +145,41 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="minPrice" className="font-medium text-slate-900">Min price (NPR)</label>
-                <input id="minPrice" name="minPrice" type="number" min="0" placeholder="1000" defaultValue={resolvedSearchParams.minPrice ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                <input id="minPrice" name="minPrice" type="number" min="0" placeholder="1000" defaultValue={resolvedSearchParams.minPrice ?? ""} className="mt-2 lux-input" />
               </div>
               <div>
                 <label htmlFor="maxPrice" className="font-medium text-slate-900">Max price (NPR)</label>
-                <input id="maxPrice" name="maxPrice" type="number" min="0" placeholder="50000" defaultValue={resolvedSearchParams.maxPrice ?? ""} className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                <input id="maxPrice" name="maxPrice" type="number" min="0" placeholder="50000" defaultValue={resolvedSearchParams.maxPrice ?? ""} className="mt-2 lux-input" />
               </div>
             </div>
             <label className="flex items-center gap-3 rounded-lg border border-slate-200 px-3 py-2 font-medium text-slate-900">
               <input type="checkbox" name="inStockOnly" value="true" defaultChecked={resolvedSearchParams.inStockOnly === "true"} />
               In stock only
             </label>
-            <button type="submit" className="w-full rounded-full bg-[#0A1628] px-4 py-2 font-semibold text-white">Apply filters</button>
+            <button type="submit" className="lux-button-primary w-full py-2.5">Apply filters</button>
           </form>
         </aside>
 
         <section className="space-y-6">
-          <div className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="surface-panel flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
               <p className="text-sm text-slate-500">Showing {products.length} products</p>
               <h2 className="text-xl font-semibold text-[#0A1628]">Here are the latest curated styles.</h2>
             </div>
             <form>
               {Object.entries(resolvedSearchParams).map(([key, value]) => key !== "sort" && value ? <input key={key} type="hidden" name={key} value={value} /> : null)}
-              <select name="sort" defaultValue={selectedSort} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600" onChange={undefined}>
+              <select name="sort" defaultValue={selectedSort} className="lux-input w-auto min-w-40" onChange={undefined}>
                 <option value="newest">Sort: newest</option>
                 <option value="priceAsc">Price: low to high</option>
                 <option value="priceDesc">Price: high to low</option>
                 <option value="popular">Popular</option>
                 <option value="rating">Top rated</option>
               </select>
-              <button type="submit" className="ml-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-[#0A1628]">Sort</button>
+              <button type="submit" className="lux-button-secondary ml-2 px-4 py-2">Sort</button>
             </form>
           </div>
           {products.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-slate-300 bg-white p-12 text-center text-slate-600">
+            <div className="empty-state">
               {isDemo ? "Database is unavailable, so live products cannot be rendered." : "No products match your search yet."}
             </div>
           ) : (

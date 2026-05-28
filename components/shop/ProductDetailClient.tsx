@@ -33,15 +33,15 @@ export function ProductDetailClient({ id, name, price, images, sku, material, ge
   const isOutOfStock = totalStock <= 0;
 
   return (
-    <div className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
-      <div className="grid gap-6 md:grid-cols-[1fr_280px]">
+    <div className="surface-panel space-y-6">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-4">
-          <div className="relative h-[420px] overflow-hidden rounded-[2rem] bg-slate-100">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-slate-100">
             <Image src={primary} alt={name} fill sizes="(min-width: 768px) 60vw, 100vw" unoptimized className="object-cover" />
           </div>
           <div className="grid gap-4 sm:grid-cols-4">
             {images.slice(0, 4).map((image) => (
-              <div key={image.url} className="relative h-24 overflow-hidden rounded-3xl bg-slate-100">
+              <div key={image.url} className="relative aspect-square overflow-hidden rounded-lg bg-slate-100">
                 <Image src={image.url} alt={name} fill sizes="160px" unoptimized className="object-cover" />
               </div>
             ))}
@@ -60,7 +60,7 @@ export function ProductDetailClient({ id, name, price, images, sku, material, ge
               {isOutOfStock ? "Out of stock" : `${totalStock} available`}
             </p>
           </div>
-          <div className="space-y-3 rounded-3xl bg-slate-50 p-6">
+          <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-5">
             <div className="flex items-center justify-between text-sm text-slate-600">
               <span>Weight</span>
               <span>{weight}</span>
@@ -97,9 +97,9 @@ export function ProductDetailClient({ id, name, price, images, sku, material, ge
             </div>
           )}
           <div className="flex items-center gap-3">
-            <button type="button" disabled={isOutOfStock} onClick={() => setQuantity(Math.max(1, quantity - 1))} className="rounded-full border border-slate-300 px-4 py-3 text-xl text-slate-700 disabled:cursor-not-allowed disabled:opacity-60">-</button>
+            <button type="button" disabled={isOutOfStock} onClick={() => setQuantity(Math.max(1, quantity - 1))} className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 text-xl text-slate-700 transition hover:border-[#D8B35A] disabled:cursor-not-allowed disabled:opacity-60">-</button>
             <span className="min-w-[3rem] text-center text-xl font-semibold">{quantity}</span>
-            <button type="button" disabled={isOutOfStock || quantity >= totalStock} onClick={() => setQuantity(quantity + 1)} className="rounded-full border border-slate-300 px-4 py-3 text-xl text-slate-700 disabled:cursor-not-allowed disabled:opacity-60">+</button>
+            <button type="button" disabled={isOutOfStock || quantity >= totalStock} onClick={() => setQuantity(quantity + 1)} className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 text-xl text-slate-700 transition hover:border-[#D8B35A] disabled:cursor-not-allowed disabled:opacity-60">+</button>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
@@ -119,7 +119,7 @@ export function ProductDetailClient({ id, name, price, images, sku, material, ge
                 if (!requireAuth()) return;
                 addWishlist({ productId: id, name, image: primary, price });
               }}
-              className="rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-[#0A1628] transition hover:border-[#C9A84C] hover:text-[#C9A84C] disabled:cursor-not-allowed disabled:opacity-60"
+              className="lux-button-secondary disabled:cursor-not-allowed disabled:opacity-60"
             >
               Add to wishlist
             </button>

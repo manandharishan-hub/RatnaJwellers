@@ -13,7 +13,7 @@ const accountMessagesReadKey = "ratna-account-messages-read";
 const primaryNavLinks = [
   { href: "/", label: "Home" },
   { href: "/shop", label: "Shop" },
-  { href: "/shop", label: "Collections" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
 ];

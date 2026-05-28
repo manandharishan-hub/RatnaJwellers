@@ -27,16 +27,21 @@ export default function ContactPage() {
 
   async function onSubmit(values: ContactForm) {
     setStatus("");
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
-    if (response.ok) {
-      setStatus("Message sent successfully. We will get back to you shortly.");
-    } else {
-      const data = await response.json();
-      setStatus(data.message || "Unable to send your message at this time.");
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json().catch(() => null);
+
+      if (response.ok) {
+        setStatus(data?.message || "Message sent successfully. We will get back to you shortly.");
+      } else {
+        setStatus(data?.message || "Unable to send your message at this time.");
+      }
+    } catch {
+      setStatus("Unable to send your message at this time. Please try again shortly.");
     }
   }
 

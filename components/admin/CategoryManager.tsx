@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import Image from "next/image";
+import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Edit2, Plus, PowerOff } from "lucide-react";
+import { Edit2, ImagePlus, PowerOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,6 +56,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
   const [categories, setCategories] = useState(initialCategories);
   const [form, setForm] = useState<CategoryFormValue>(emptyCategory);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const isEditing = Boolean(form._id);
@@ -64,6 +66,36 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
     setForm(emptyCategory);
     setError("");
     setMessage("");
+  }
+
+  async function uploadCategoryImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setIsUploading(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+      uploadData.append("folder", "categories");
+      const response = await fetch("/api/admin/uploads", { method: "POST", body: uploadData });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setError(data.message || "Image upload failed.");
+        return;
+      }
+
+      setForm((current) => ({ ...current, image: data.url }));
+      setMessage("Category image uploaded.");
+    } catch {
+      setError("Image upload failed.");
+    } finally {
+      setIsUploading(false);
+    }
   }
 
   async function submitCategory(event: FormEvent<HTMLFormElement>) {
@@ -148,8 +180,30 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
           </select>
         </div>
         <div>
-          <Label htmlFor="image">Image URL</Label>
-          <Input id="image" value={form.image} onChange={(event) => setForm((current) => ({ ...current, image: event.target.value }))} />
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <Label htmlFor="image">Image URL</Label>
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-[#0A1628] transition hover:border-[#D8B35A] hover:text-[#9A7627]">
+              <ImagePlus size={14} />
+              {isUploading ? "Uploading..." : "Upload Image"}
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={uploadCategoryImage} disabled={isUploading} />
+            </label>
+          </div>
+          {form.image && (
+            <div className="mb-3 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+              <div className="relative aspect-[16/9]">
+                <Image src={form.image} alt={form.name || "Category preview"} fill sizes="340px" unoptimized className="object-cover" />
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm((current) => ({ ...current, image: "" }))}
+                className="flex w-full items-center justify-center gap-2 border-t border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:text-red-600"
+              >
+                <X size={14} />
+                Remove image
+              </button>
+            </div>
+          )}
+          <Input id="image" value={form.image} onChange={(event) => setForm((current) => ({ ...current, image: event.target.value }))} placeholder="Paste image link or upload a file" />
         </div>
         <div>
           <Label htmlFor="description">Description</Label>
@@ -162,7 +216,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
         {message && <p className="text-sm text-green-700">{message}</p>}
         {error && <p className="text-sm text-red-600">{error}</p>}
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button type="submit" disabled={isSaving}>{isSaving ? "Saving..." : "Save category"}</Button>
+          <Button type="submit" disabled={isSaving || isUploading}>{isSaving ? "Saving..." : "Save category"}</Button>
           {isEditing && <button type="button" onClick={resetForm} className="rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-[#0A1628]">Cancel edit</button>}
         </div>
       </form>

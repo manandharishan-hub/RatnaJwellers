@@ -9,7 +9,7 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif"
 
 export const metadata: Metadata = {
   title: "Ratna Jewels | Luxury Jewelry Store",
-  description: "Ratna Jewels is a luxury jewelry ecommerce experience with curated collections, secure checkout, and premium customer support.",
+  description: "Ratna Jewels is a luxury jewelry ecommerce experience with a curated gallery, secure checkout, and premium customer support.",
   openGraph: {
     title: "Ratna Jewels",
     description: "Luxury jewelry ecommerce experience with premium designs and secure checkout.",

@@ -33,7 +33,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     return (
       <div className="px-6 py-20 text-center">
         <h1 className="text-3xl font-semibold text-[#0A1628]">{isDemo ? "Database unavailable" : "Category not found"}</h1>
-        <p className="mt-3 text-slate-600">{isDemo ? "Start MongoDB or update MONGODB_URI to render this category from Mongoose." : "Please choose a different collection."}</p>
+        <p className="mt-3 text-slate-600">{isDemo ? "Start MongoDB or update MONGODB_URI to render this category from Mongoose." : "Please choose a different gallery category."}</p>
         <Link href="/shop" className="mt-6 inline-flex rounded-full bg-[#0A1628] px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-900">Back to shop</Link>
       </div>
     );
@@ -43,7 +43,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     <div className="px-6 py-10 md:px-10 lg:px-16">
       <div className="mb-8">
         <p className="text-sm uppercase tracking-[0.28em] text-[#C9A84C]">{category.name}</p>
-        <h1 className="mt-3 text-4xl font-semibold text-[#0A1628]">{category.description || `${category.name} collection`}</h1>
+        <h1 className="mt-3 text-4xl font-semibold text-[#0A1628]">{category.description || `${category.name} gallery`}</h1>
       </div>
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {products.length === 0 ? (

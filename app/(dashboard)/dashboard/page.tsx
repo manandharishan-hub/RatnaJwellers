@@ -133,7 +133,7 @@ export default async function UserDashboardPage() {
                   <p className="font-semibold text-[#0A1628]">{centsToCurrency(order.total)}</p>
                 </Link>
               ))}
-              {orders.length === 0 && <div className="px-5 py-10 text-center text-slate-500">No orders yet. Start with the latest jewellery collection.</div>}
+              {orders.length === 0 && <div className="px-5 py-10 text-center text-slate-500">No orders yet. Start with the latest jewellery gallery.</div>}
             </div>
           </div>
 

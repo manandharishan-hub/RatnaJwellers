@@ -33,10 +33,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   if (!product) {
     return (
-      <div className="px-6 py-20 text-center">
+      <div className="page-shell text-center">
         <h1 className="text-3xl font-semibold text-[#0A1628]">{isDemo ? "Database unavailable" : "Product not found"}</h1>
         <p className="mt-4 text-slate-600">{isDemo ? "Start MongoDB or update MONGODB_URI to render this product from Mongoose." : "The product you&apos;re looking for is unavailable or has been removed."}</p>
-        <Link href="/shop" className="mt-6 inline-flex rounded-full bg-[#0A1628] px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-900">Back to shop</Link>
+        <Link href="/shop" className="lux-button-primary mt-6">Back to shop</Link>
       </div>
     );
   }
@@ -52,26 +52,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const primaryImage = productImages.find((image) => image.isPrimary)?.url ?? productImages[0]?.url ?? "/favicon.ico";
 
   return (
-    <div className="space-y-10 px-6 py-10 md:px-10 lg:px-16">
+    <div className="page-shell space-y-10">
       <div className="flex flex-col gap-3 text-sm text-slate-600">
         <Link href="/shop" className="underline decoration-[#C9A84C]/40">Shop</Link>
         <span>{product.name}</span>
       </div>
       <div className="grid gap-10 xl:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-8">
-          <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-            <div className="relative h-[520px] overflow-hidden rounded-lg bg-slate-100">
+          <div className="surface-panel">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-slate-100">
               <Image src={primaryImage} alt={product.name} fill sizes="(min-width: 1280px) 60vw, 100vw" loading="eager" unoptimized className="object-cover" />
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {productImages.slice(0, 3).map((image) => (
-                <div key={image.url} className="relative h-40 overflow-hidden rounded-lg bg-slate-100">
+                <div key={image.url} className="relative aspect-[4/3] overflow-hidden rounded-lg bg-slate-100">
                   <Image src={image.url} alt={product.name} fill sizes="(min-width: 640px) 33vw, 100vw" unoptimized className="object-cover" />
                 </div>
               ))}
             </div>
           </div>
-          <div className="grid gap-4 rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="surface-panel grid gap-4">
             <div className="flex flex-wrap items-center gap-3">
               <Badge variant="gold">{product.material}</Badge>
               <Badge variant="light">{product.gemstone}</Badge>
@@ -92,7 +92,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
           </div>
-          <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="surface-panel">
             <h3 className="text-xl font-semibold text-[#0A1628]">Reviews</h3>
             {reviews.length === 0 ? (
               <p className="mt-4 text-slate-600">No reviews yet. Be the first to share your experience.</p>

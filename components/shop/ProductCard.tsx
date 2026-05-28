@@ -15,9 +15,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const isOutOfStock = (product.totalStock ?? 0) <= 0;
 
   return (
-    <article className="group overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+    <article className="group overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-[#D8B35A] hover:shadow-md">
       <Link href={`/product/${product.slug}`} className="relative block overflow-hidden bg-slate-100">
-        <div className="relative h-72 w-full">
+        <div className="relative aspect-[4/5] w-full">
           <Image src={primaryImage} alt={product.name} fill sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" unoptimized className="object-cover transition duration-300 group-hover:scale-105" />
         </div>
         {product.isNewArrival && <Badge className="absolute left-4 top-4">New</Badge>}
@@ -25,8 +25,8 @@ export function ProductCard({ product }: ProductCardProps) {
         {isOutOfStock && <Badge className="absolute bottom-4 left-4 bg-red-600 text-white">Out of stock</Badge>}
       </Link>
       <div className="space-y-3 px-5 py-5">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-lg font-semibold text-slate-900">{product.name}</h3>
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="min-h-12 text-base font-semibold leading-6 text-slate-950">{product.name}</h3>
           <ProductWishlistButton productId={product._id.toString()} name={product.name} image={primaryImage} price={product.price} />
         </div>
         <p className="text-sm text-slate-500 line-clamp-2">{product.description}</p>
@@ -37,7 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
               <p className="text-sm text-slate-500 line-through">{centsToCurrency(product.comparePrice)}</p>
             )}
           </div>
-          <Link href={`/product/${product.slug}`} className="inline-flex items-center gap-2 rounded-full bg-[#0A1628] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#111827]/90">
+          <Link href={`/product/${product.slug}`} className="lux-button-primary px-4 py-2">
             <ShoppingBag size={16} />
             View
           </Link>

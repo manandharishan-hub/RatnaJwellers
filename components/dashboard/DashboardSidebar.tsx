@@ -42,7 +42,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9A7627]">Ratna Jewels</p>
-            <p className="mt-1 text-sm leading-6 text-slate-600">Quick access to your jewellery orders and curated collections.</p>
+            <p className="mt-1 text-sm leading-6 text-slate-600">Quick access to your jewellery orders and curated gallery.</p>
           </div>
         </div>
       </div>

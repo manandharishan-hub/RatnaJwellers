@@ -32,8 +32,8 @@ export default function CartPage() {
   }, [appliedCoupon, couponCode, setCoupon]);
 
   return (
-    <div className="bg-[#F8F6F2] px-6 py-10 md:px-10 lg:px-16">
-      <section className="mx-auto max-w-7xl">
+    <div className="bg-[#F8F6F2]">
+      <section className="page-shell">
         <div className="grid gap-6 rounded-lg bg-[#0A1628] p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="flex items-center gap-2 text-sm font-semibold uppercase text-[#D8B35A]">
@@ -52,7 +52,7 @@ export default function CartPage() {
         </div>
 
         {items.length === 0 ? (
-          <div className="mt-8 grid gap-8 rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm md:p-12">
+          <div className="empty-state mt-8 grid gap-8">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#0A1628] text-white">
               <Gem size={28} />
             </div>
@@ -62,7 +62,7 @@ export default function CartPage() {
                 Browse rings, necklaces, bracelets, and gifts to begin building your order.
               </p>
             </div>
-            <Link href="/shop" className="mx-auto inline-flex items-center gap-2 rounded-full bg-[#0A1628] px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-900">
+            <Link href="/shop" className="lux-button-primary mx-auto">
               Continue shopping
               <ArrowRight size={16} />
             </Link>
@@ -75,7 +75,7 @@ export default function CartPage() {
               ))}
             </div>
 
-            <aside className="h-fit rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+            <aside className="surface-panel h-fit">
               <h2 className="font-serif text-2xl font-semibold text-[#0A1628]">Order summary</h2>
               <div className="mt-6 space-y-4 text-sm text-slate-600">
                 <div className="flex justify-between">
@@ -131,9 +131,9 @@ export default function CartPage() {
                         }
                       }}
                       placeholder="Enter coupon code"
-                      className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 outline-none focus:border-[#C9A84C]"
+                      className="lux-input min-w-0 flex-1 rounded-full py-2"
                     />
-                    <button type="submit" className="rounded-full bg-[#0A1628] px-4 py-2 font-semibold text-white">Apply</button>
+                    <button type="submit" className="lux-button-primary px-4 py-2">Apply</button>
                   </div>
                   {couponMessage && <p className={`text-xs font-semibold ${activeCoupon ? "text-emerald-700" : "text-red-600"}`}>{couponMessage}</p>}
                   {activeCoupon && <p className="text-xs font-semibold text-emerald-700">Coupon applied: {activeCoupon.code}</p>}

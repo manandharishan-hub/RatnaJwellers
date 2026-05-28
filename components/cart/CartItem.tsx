@@ -11,8 +11,8 @@ interface CartItemProps {
 
 export function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-[2rem] border border-slate-200 bg-white p-6 sm:flex-row sm:items-center">
-      <div className="relative h-28 w-28 overflow-hidden rounded-3xl bg-slate-100">
+    <div className="surface-card flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-lg bg-slate-100">
         <Image src={item.image || "/favicon.ico"} alt={item.name} fill sizes="112px" unoptimized className="object-cover" />
       </div>
       <div className="flex-1">
@@ -21,11 +21,11 @@ export function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
         <p className="mt-2 text-base font-semibold text-[#0A1628]">{centsToCurrency(item.price)}</p>
       </div>
       <div className="flex items-center gap-3">
-        <button type="button" onClick={() => onUpdate(item.productId, item.quantity - 1, item.variant)} className="rounded-full border border-slate-300 p-2 text-slate-700">
+        <button type="button" onClick={() => onUpdate(item.productId, item.quantity - 1, item.variant)} className="rounded-full border border-slate-300 p-2 text-slate-700 transition hover:border-[#D8B35A]">
           <Minus size={16} />
         </button>
         <span className="min-w-[2rem] text-center text-sm font-semibold">{item.quantity}</span>
-        <button type="button" onClick={() => onUpdate(item.productId, item.quantity + 1, item.variant)} className="rounded-full border border-slate-300 p-2 text-slate-700">
+        <button type="button" onClick={() => onUpdate(item.productId, item.quantity + 1, item.variant)} className="rounded-full border border-slate-300 p-2 text-slate-700 transition hover:border-[#D8B35A]">
           <Plus size={16} />
         </button>
       </div>

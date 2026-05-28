@@ -12,11 +12,11 @@ const EXTENSIONS_BY_TYPE: Record<string, string> = {
   "image/webp": "webp",
 };
 
-async function saveImageLocally(name: string, bytes: Buffer) {
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
+async function saveImageLocally(folder: string, name: string, bytes: Buffer) {
+  const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, name), bytes);
-  return `/uploads/products/${name}`;
+  return `/uploads/${folder}/${name}`;
 }
 
 export async function POST(request: Request) {
@@ -39,17 +39,19 @@ export async function POST(request: Request) {
   const bytes = Buffer.from(await file.arrayBuffer());
   const extension = EXTENSIONS_BY_TYPE[file.type] ?? "jpg";
   const fileName = `${Date.now()}-${randomUUID()}.${extension}`;
+  const requestedFolder = formData.get("folder");
+  const folder = requestedFolder === "gallery" || requestedFolder === "categories" ? requestedFolder : "products";
   let url: string;
 
   try {
     const { uploadImageToFirebase } = await import("@/lib/firebase");
-    url = await uploadImageToFirebase(`products/${fileName}`, bytes, file.type);
+    url = await uploadImageToFirebase(`${folder}/${fileName}`, bytes, file.type);
   } catch (error) {
     if (process.env.NODE_ENV === "production") {
       console.error("Image upload failed.", error);
       return NextResponse.json({ message: "Image upload failed." }, { status: 500 });
     }
-    url = await saveImageLocally(fileName, bytes);
+    url = await saveImageLocally(folder, fileName, bytes);
   }
 
   return NextResponse.json({ url });
